@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Apply dark mode by default */
+html {
+    /* This enables dark mode globally */
+    background-color: #1a202c; /* Dark background */
+    color: white; /* White text for dark mode */
+  }
+  
