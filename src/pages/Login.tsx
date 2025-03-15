@@ -1,45 +1,66 @@
 import { useState } from "react";
-import { useAuth } from "../providers/AuthProvider";
-import { useNavigate } from "react-router-dom";
-import Button from "../components/ui/Button";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebaseConfig";
+import { useAuth } from "../components/AuthProvider";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const [error, setError] = useState("");
+  const { loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     try {
-      await login(email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       navigate("/dashboard");
-    } catch (error) {
-      console.error("Login failed:", error);
+    } catch (err) {
+      setError("Invalid email or password");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-white mb-6">Login</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">
+        <h2 className="text-3xl font-bold text-center">Login</h2>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 rounded-md bg-gray-700 text-white border border-gray-600"
+            className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
+            required
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full p-2 rounded-md bg-gray-700 text-white border border-gray-600"
+            className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
+            required
           />
-          <Button type="submit" variant="primary" className="w-full">Login</Button>
+          <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
+            Login
+          </button>
         </form>
+        <button
+          onClick={loginWithGoogle}
+          className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
+        >
+          Login with Google
+        </button>
+        <p className="text-center">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-400">
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -1,12 +1,17 @@
-import { useAuth } from "../providers/AuthProvider";
+import Sidebar from "../components/Sidebar";
+import DashboardHeader from "../components/DashboardHeader";
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-
   return (
-    <div>
-      <h1>Welcome, {user?.name}!</h1>
-      <button onClick={logout}>Logout</button>
+    <div className="flex h-screen bg-gray-900 text-white">
+      <Sidebar />
+      <div className="flex-1 p-6">
+        <DashboardHeader />
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold">Your Wishlists</h2>
+          {/* Wishlist cards will go here */}
+        </div>
+      </div>
     </div>
   );
 };
