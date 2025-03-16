@@ -1,5 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import DashboardHeader from "../components/DashboardHeader";
+import Wishlist from "../components/Wishlist";
 
 const Dashboard = () => {
   return (
@@ -9,7 +10,7 @@ const Dashboard = () => {
         <DashboardHeader />
         <div className="mt-6">
           <h2 className="text-xl font-semibold">Your Wishlists</h2>
-          {/* Wishlist cards will go here */}
+          <Wishlist />  {/* ✅ Add Wishlist Component Here */}
         </div>
       </div>
     </div>

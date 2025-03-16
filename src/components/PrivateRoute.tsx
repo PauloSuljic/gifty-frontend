@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react";
 // Define our database user type
 export type GiftyUser = {
   id: string;
-  email: string;
   username: string;
   bio: string;
   avatarUrl: string;
@@ -58,7 +57,6 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
         const userData = await response.json();
         setUser({
           id: userData.id,
-          email: userData.email,
           username: userData.username || firebaseUser.displayName || "Unknown",
           bio: userData.bio || "",
           avatarUrl: userData.avatarUrl || firebaseUser.photoURL || "/default-avatar.png",
