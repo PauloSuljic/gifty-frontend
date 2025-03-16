@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthProvider";
 import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrash2, FiShare2 } from "react-icons/fi";
 
 // Define TypeScript types
 type WishlistType = {
@@ -167,6 +167,23 @@ const Wishlist = () => {
     }
   };
 
+  const generateShareLink = async (wishlistId: string) => {
+    const token = await firebaseUser?.getIdToken();
+    const response = await fetch(`http://localhost:5140/api/shared-links/${wishlistId}/generate`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  
+    if (response.ok) {
+      const data = await response.json();
+      const shareUrl = `${window.location.origin}/shared/${data.shareCode}`;
+      navigator.clipboard.writeText(shareUrl);
+      alert("Share link copied to clipboard!"); // ✅ Notify user
+    } else {
+      console.error("Error generating share link:", await response.json());
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto p-6 text-white">
       {/* Create New Wishlist */}
@@ -195,12 +212,16 @@ const Wishlist = () => {
               {/* Wishlist Title & Delete Button */}
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold">{wishlist.name}</h3>
-                <button
-                  onClick={() => deleteWishlist(wishlist.id)}
-                  className="text-red-500 hover:text-red-700 transition"
-                >
-                  <FiTrash2 size={20} />
-                </button>
+                <div className="flex space-x-2">
+                    <button
+                    onClick={() => deleteWishlist(wishlist.id)} className="text-red-500 hover:text-red-700 transition">
+                        <FiTrash2 size={20} />
+                    </button>
+
+                    <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
+                        <FiShare2 size={20} />
+                    </button>
+                </div>
               </div>
   
               {/* Add Wishlist Item */}

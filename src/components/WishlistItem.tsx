@@ -3,11 +3,11 @@ type WishlistItemProps = {
     name: string;
     link: string;
     isReserved: boolean;
-    reservedBy: string | null;
-    wishlistOwner: string; // ✅ Pass the wishlist owner's ID
-    currentUser?: string; // ✅ Pass the current logged-in user ID
+    reservedBy?: string | null;
+    wishlistOwner: string; // ✅ Owner of the wishlist
+    currentUser?: string; // ✅ Currently logged-in user (empty if guest)
     onToggleReserve: () => void;
-    onDelete: () => void;
+    onDelete?: () => void; // ✅ Delete is optional
   };
   
   const WishlistItem = ({
@@ -20,8 +20,10 @@ type WishlistItemProps = {
     onToggleReserve,
     onDelete
   }: WishlistItemProps) => {
-    const canReserve = !isReserved && wishlistOwner !== currentUser; // ✅ Only non-owners can reserve
-    const canUnreserve = isReserved && reservedBy === currentUser; // ✅ Only the reserver can unreserve
+    const isGuest = !currentUser; // ✅ Guest users will not see reserve/unreserve buttons
+    const canReserve = !isGuest && !isReserved && wishlistOwner !== currentUser; // ✅ Only logged-in non-owners can reserve
+    const canUnreserve = !isGuest && isReserved && reservedBy === currentUser; // ✅ Only the reserver can unreserve
+    const canDelete = wishlistOwner === currentUser && onDelete; // ✅ Only owner can delete
   
     return (
       <div className="p-4 bg-white/10 rounded-lg shadow-lg backdrop-blur-md border border-white/20 flex justify-between items-center">
@@ -34,6 +36,7 @@ type WishlistItemProps = {
           )}
         </div>
         <div className="flex items-center space-x-2">
+          {/* ✅ Hide buttons for guests */}
           {canReserve && (
             <button
               className="px-4 py-2 bg-green-500 rounded-lg transition hover:bg-green-600"
@@ -50,9 +53,11 @@ type WishlistItemProps = {
               Unreserve
             </button>
           )}
-          <button className="px-4 py-2 bg-purple-500 rounded-lg transition hover:bg-purple-600" onClick={onDelete}>
-            Delete
-          </button>
+          {canDelete && (
+            <button className="px-4 py-2 bg-red-500 rounded-lg transition hover:bg-red-600" onClick={onDelete}>
+              Delete
+            </button>
+          )}
         </div>
       </div>
     );

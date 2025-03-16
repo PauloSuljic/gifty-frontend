@@ -3,8 +3,10 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import SharedWishlist from "./pages/SharedWishlist";
 import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./pages/NotFound";
+import { AuthProvider } from "./components/AuthProvider";
 
 const App = () => {
   return (
@@ -23,6 +25,8 @@ const App = () => {
           </PrivateRoute>
         }
       />
+
+      <Route path="/shared/:shareCode" element={<SharedWishlist />} />
 
       {/* 404 Page */}
       <Route path="*" element={<NotFound />} />
