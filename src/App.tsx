@@ -7,6 +7,7 @@ import SharedWishlist from "./pages/SharedWishlist";
 import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./components/AuthProvider";
+import SharedWithMe from "./components/ui/SharedWithMe";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
       />
 
       <Route path="/shared/:shareCode" element={<SharedWishlist />} />
+      <Route path="/shared-with-me" element={<PrivateRoute><SharedWithMe /></PrivateRoute>} />
 
       {/* 404 Page */}
       <Route path="*" element={<NotFound />} />
