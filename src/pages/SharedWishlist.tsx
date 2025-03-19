@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import WishlistItem from "../components/WishlistItem";
 import { useAuth } from "../components/AuthProvider";
+import Card from "../components/ui/Card";
 
-// ✅ Define type for Wishlist & Items
+// ✅ Define TypeScript types
 type WishlistItemType = {
   id: string;
   name: string;
@@ -16,22 +17,47 @@ type WishlistType = {
   id: string;
   name: string;
   items: WishlistItemType[];
-  userId: string;
+  ownerId: string;
+  ownerName: string;
 };
 
 const SharedWishlist = () => {
   const { shareCode } = useParams<{ shareCode: string }>(); 
-  const [wishlist, setWishlist] = useState<WishlistType | null>(null); 
+  const [wishlist, setWishlist] = useState<WishlistType | null>(null);
+  const [loading, setLoading] = useState(true);
   const { firebaseUser } = useAuth();
 
   useEffect(() => {
-    fetch(`http://localhost:5140/api/shared-links/${shareCode}`)
-      .then((res) => res.json())
-      .then((data) => setWishlist(data))
-      .catch(() => setWishlist(null));
-  }, [shareCode]);
+    const fetchSharedWishlist = async () => {
+      setLoading(true);
+      const token = await firebaseUser?.getIdToken(); // ✅ Get token if logged in
+      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // ✅ Function to toggle reservation (Guests can only reserve/unreserve items)
+      try {
+        const response = await fetch(`http://localhost:5140/api/shared-links/${shareCode}`, {
+          method: "GET",
+          headers: headers
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setWishlist(data);
+        } else {
+          console.error("Failed to fetch shared wishlist.");
+          setWishlist(null);
+        }
+      } catch (error) {
+        console.error("Error fetching shared wishlist:", error);
+        setWishlist(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSharedWishlist();
+  }, [shareCode, firebaseUser]);
+
+  // ✅ Function to toggle reservation (Only logged-in users can reserve/unreserve)
   const toggleReservation = async (itemId: string) => {
     const token = await firebaseUser?.getIdToken();
     if (!token) return alert("You need to be logged in to reserve items.");
@@ -56,25 +82,36 @@ const SharedWishlist = () => {
     }
   };
 
-  if (!wishlist) return <p className="text-white text-center">Loading or invalid link...</p>;
+  if (loading) return <p className="text-white text-center">Loading...</p>;
+  if (!wishlist) return <p className="text-gray-300 text-center mt-6">Invalid or expired shared link.</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-6 text-white">
-      <h2 className="text-3xl font-semibold">{wishlist.name}</h2>
-      <div className="mt-4 space-y-3">
-        {wishlist.items.map((item) => (
-          <WishlistItem
-            key={item.id}
-            id={item.id}
-            name={item.name}
-            link={item.link}
-            isReserved={item.isReserved}
-            reservedBy={item.reservedBy || ""}
-            wishlistOwner={wishlist.userId}
-            currentUser={firebaseUser?.uid || ""} 
-            onToggleReserve={() => toggleReservation(item.id)}
-          />
-        ))}
+      <Card className="p-6">
+        <h2 className="text-3xl font-semibold">{wishlist.name}</h2>
+        <p className="text-gray-400 text-sm mt-2">
+        Shared by: {wishlist.ownerId === firebaseUser?.uid ? "You" : wishlist.ownerName || "Unknown"}
+        </p>
+      </Card>
+
+      <div className="mt-6 space-y-3">
+        {wishlist.items.length > 0 ? (
+          wishlist.items.map((item) => (
+            <WishlistItem
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              link={item.link}
+              isReserved={item.isReserved}
+              reservedBy={item.reservedBy || ""}
+              wishlistOwner={wishlist.ownerId}
+              currentUser={firebaseUser?.uid || ""} 
+              onToggleReserve={() => toggleReservation(item.id)}
+            />
+          ))
+        ) : (
+          <p className="text-gray-400 text-center">No items in this wishlist.</p>
+        )}
       </div>
     </div>
   );
