@@ -10,7 +10,7 @@ const Dashboard = () => {
         <DashboardHeader />
         <div className="mt-6">
           <h2 className="text-xl font-semibold">Your Wishlists</h2>
-          <Wishlist />  {/* ✅ Add Wishlist Component Here */}
+          <Wishlist />
         </div>
       </div>
     </div>

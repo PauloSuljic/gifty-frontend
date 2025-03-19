@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiGift, FiLogOut, FiHome } from "react-icons/fi";
+import { FiGift, FiLogOut, FiHome, FiUser } from "react-icons/fi";
 import { useAuth } from "../components/AuthProvider";
 
 const Sidebar = () => {
@@ -15,6 +15,9 @@ const Sidebar = () => {
         </Link>
         <Link to="/shared-with-me" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
           <FiGift size={20} /> <span>Shared With Me</span>
+        </Link>
+        <Link to="/profile" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
+          <FiUser size={20} /> <span>Profile</span>
         </Link>
       </nav>
 

@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import SharedWishlist from "./pages/SharedWishlist";
 import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./pages/NotFound";
-import { AuthProvider } from "./components/AuthProvider";
+import Profile from "./pages/Profile";
 import SharedWithMe from "./components/ui/SharedWithMe";
 
 const App = () => {
@@ -29,6 +29,7 @@ const App = () => {
 
       <Route path="/shared/:shareCode" element={<SharedWishlist />} />
       <Route path="/shared-with-me" element={<PrivateRoute><SharedWithMe /></PrivateRoute>} />
+      <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
 
       {/* 404 Page */}
       <Route path="*" element={<NotFound />} />
