@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthProvider";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/layout/Layout";
 
 const avatarOptions = [
   "/avatars/avatar1.png",
@@ -63,64 +63,68 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* ✅ Sidebar */}
-      <Sidebar />
-
-      {/* ✅ Main Profile Content */}
-      <div className="flex-1 overflow-y-auto p-6 text-white">
-      {/* Create New Wishlist */}
-        <h2 className="text-3xl font-semibold mb-6">Edit Profile</h2>
-        {/* Username */}
-        <div className="mb-4">
-          <label className="block text-gray-400">Username</label>
-          <input
-            type="text"
-            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none"
-            value={user.username}
-            onChange={(e) => setUser({ ...user, username: e.target.value })}
-          />
-        </div>
-
-        {/* Bio */}
-        <div className="mb-4">
-          <label className="block text-gray-400">Bio</label>
-          <textarea
-            className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none resize-none"
-            value={user.bio}
-            onChange={(e) => setUser({ ...user, bio: e.target.value })}
-            maxLength={100}
-          />
-        </div>
-
-        {/* Avatar Selection */}
-        <div className="mb-6">
-          <label className="block text-gray-400 mb-2">Select Avatar</label>
-          <div className="grid grid-cols-5 gap-4">
-            {avatarOptions.map((avatar) => (
-              <img
-                key={avatar}
-                src={avatar}
-                alt="Avatar"
-                className={`w-25 h-25 rounded-full cursor-pointer border-4 ${
-                  selectedAvatar === avatar ? "border-blue-500" : "border-transparent"
-                }`}
-                onClick={() => setSelectedAvatar(avatar)}
+    <Layout>
+      <h2 className="text-3xl font-semibold pt-6 text-center">Edit Profile</h2>
+      <div className="mx-auto bg-gray-800 p-6 m-6 rounded-lg shadow-lg text-white w-full max-w-3xl">
+        {/* Profile Content - Side by Side */}
+        <div className="flex items-center justify-center gap-10">
+          
+          {/* Left Column: Username & Bio */}
+          <div className="w-100 pt-6">
+            {/* Username */}
+            <div className="mb-4">
+              <label className="block text-gray-400">Username</label>
+              <input
+                type="text"
+                className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none"
+                value={user.username}
+                onChange={(e) => setUser({ ...user, username: e.target.value })}
+                maxLength={25}
               />
-            ))}
+            </div>
+  
+            {/* Bio */}
+            <div className="mb-4">
+              <label className="block text-gray-400">Bio</label>
+              <textarea
+                className="w-full px-4 py-2 rounded-lg bg-white/20 text-white outline-none resize-none"
+                value={user.bio}
+                onChange={(e) => setUser({ ...user, bio: e.target.value })}
+                maxLength={70}
+              />
+            </div>
+          </div>
+  
+          {/* Right Column: Avatar Selection */}
+          <div className="flex flex-col items-center">
+            <label className="block text-gray-400 mb-2">Select Avatar</label>
+            <div className="grid grid-cols-3 gap-3">
+              {avatarOptions.map((avatar) => (
+                <img
+                  key={avatar}
+                  src={avatar}
+                  alt="Avatar"
+                  className={`w-16 h-16 rounded-full cursor-pointer border-4 transition ${
+                    selectedAvatar === avatar ? "border-blue-500 scale-105" : "border-transparent"
+                  }`}
+                  onClick={() => setSelectedAvatar(avatar)}
+                />
+              ))}
+            </div>
           </div>
         </div>
-
+  
         {/* Save Button */}
         <button
           onClick={handleUpdateProfile}
-          className="px-6 py-3 bg-purple-500 hover:bg-purple-600 rounded-lg transition shadow-lg w-full"
+          className="px-6 py-3 bg-purple-500 hover:bg-purple-600 rounded-lg transition shadow-lg w-full mt-6"
         >
           Save Changes
         </button>
       </div>
-    </div>
+    </Layout>
   );
+  
 };
 
 export default Profile;
