@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthProvider";
 import Layout from "../components/layout/Layout";
+import { toast } from "react-hot-toast";
 
 const avatarOptions = [
   "/avatars/avatar1.png",
@@ -55,22 +56,22 @@ const Profile = () => {
     });
 
     if (!response.ok) {
-      alert("Failed to update profile");
+      toast.error("Failed to update profile 😞");
       return;
     }
-
-    alert("Profile updated successfully!");
+  
+    toast.success("Profile updated successfully! 🎉");
   };
 
   return (
     <Layout>
       <h2 className="text-3xl font-semibold pt-6 text-center">Edit Profile</h2>
-      <div className="mx-auto bg-gray-800 p-6 m-6 rounded-lg shadow-lg text-white w-full max-w-3xl">
+      <div className="mx-auto p-6 text-white w-full max-w-3xl">
         {/* Profile Content - Side by Side */}
-        <div className="flex items-center justify-center gap-10">
+        <div className="flex justify-center gap-20">
           
           {/* Left Column: Username & Bio */}
-          <div className="w-100 pt-6">
+          <div className="w-80 pt-10">
             {/* Username */}
             <div className="mb-4">
               <label className="block text-gray-400">Username</label>

@@ -8,32 +8,61 @@ import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
 import SharedWithMe from "./components/SharedWithMe";
+import { ToastContainer } from "react-toastify";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
-    <Routes>
-      {/* Public Routes */}
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-
-      {/* Private Routes (Require Authentication) */}
-      <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute>
-            <Dashboard />
-          </PrivateRoute>
-        }
+    <>
+      <ToastContainer />
+      <Toaster
+        position="bottom-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000, // Custom duration (default is 5000ms)
+          style: {
+            background: "#333", // Dark mode background
+            color: "#fff", // White text
+            border: "1px solid #555", // Optional: subtle border
+          },
+          success: {
+            iconTheme: {
+              primary: "#22c55e", // Green success icon
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444", // Red error icon
+              secondary: "#fff",
+            },
+          },
+        }}
       />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-      <Route path="/shared/:shareCode" element={<SharedWishlist />} />
-      <Route path="/shared-with-me" element={<PrivateRoute><SharedWithMe /></PrivateRoute>} />
-      <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        {/* Private Routes (Require Authentication) */}
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
 
-      {/* 404 Page */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="/shared/:shareCode" element={<SharedWishlist />} />
+        <Route path="/shared-with-me" element={<PrivateRoute><SharedWithMe /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+
+        {/* 404 Page */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 };
 

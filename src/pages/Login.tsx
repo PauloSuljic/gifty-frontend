@@ -45,13 +45,13 @@ const Login = () => {
             className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
             required
           />
-          <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded">
+          <button className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded">
             Login
           </button>
         </form>
         <button
           onClick={loginWithGoogle}
-          className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
+          className="w-full px-4 py-2 bg-white text-black rounded"
         >
           Login with Google
         </button>

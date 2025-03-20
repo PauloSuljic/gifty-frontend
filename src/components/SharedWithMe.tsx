@@ -3,6 +3,7 @@ import { useAuth } from "./AuthProvider";
 import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Layout from "./layout/Layout";
+import { toast } from "react-hot-toast";
 
 type SharedWishlistItem = {
   id: string;
@@ -59,14 +60,23 @@ const SharedWithMe = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        
-        // ✅ If the backend returns "You can only reserve 1 item per wishlist", show an alert
-        if (errorData.error === "You can only reserve 1 item per wishlist.") {
-          alert("You can only reserve 1 item per wishlist.");
-        }
-        return; // ✅ Stop execution if an error occurs
+          const errorData = await response.json();
+
+          // ✅ Show a Toast Notification using react-hot-toast
+          if (errorData.error === "You can only reserve 1 item per wishlist.") {
+              toast.error("You can only reserve 1 item per wishlist.", {
+                  duration: 3000, // Closes in 3 seconds
+                  position: "bottom-center",
+                  style: {
+                      background: "#333",  // Dark mode background
+                      color: "#fff",       // White text
+                      border: "1px solid #555", // Optional subtle border
+                  },
+              });
+          }
+          return; // ✅ Stop execution if an error occurs
       }
+
 
       const updatedItem = await response.json();
 

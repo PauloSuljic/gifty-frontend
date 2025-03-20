@@ -1,5 +1,5 @@
-import React, { useRef } from "react";
-import { FiCopy } from "react-icons/fi";
+import React, { useRef, useState } from "react";
+import { FiCopy, FiCheck } from "react-icons/fi";
 
 interface ShareLinkModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface ShareLinkModalProps {
 
 const ShareLinkModal = ({ isOpen, onClose, shareUrl }: ShareLinkModalProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isCopied, setIsCopied] = useState(false); // ✅ Track if link is copied
 
   // ✅ Close modal when clicking outside
   const handleClickOutside = (e: React.MouseEvent) => {
@@ -17,11 +18,12 @@ const ShareLinkModal = ({ isOpen, onClose, shareUrl }: ShareLinkModalProps) => {
     }
   };
 
-  // ✅ Copy to clipboard
+  // ✅ Copy to clipboard & show "Copied!" temporarily
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!"); // ✅ Optionally replace with a toast notification
+      setIsCopied(true); // ✅ Set copied state
+      setTimeout(() => setIsCopied(false), 2000); // ✅ Reset after 2s
     } catch (err) {
       console.error("Failed to copy:", err);
     }
@@ -45,10 +47,11 @@ const ShareLinkModal = ({ isOpen, onClose, shareUrl }: ShareLinkModalProps) => {
           />
           <button 
             onClick={copyToClipboard} 
-            className="ml-2 px-4 py-2 bg-purple-500 rounded-lg hover:bg-purple-600 transition flex items-center space-x-2"
+            className={`ml-2 px-4 py-2 rounded-lg transition flex items-center space-x-2 
+              ${isCopied ? "bg-green-500" : "bg-purple-500 hover:bg-purple-600"}`}
           >
-            <FiCopy size={18} />
-            <span>Copy</span>
+            {isCopied ? <FiCheck size={18} /> : <FiCopy size={18} />}
+            <span>{isCopied ? "Copied!" : "Copy"}</span>
           </button>
         </div>
       </div>

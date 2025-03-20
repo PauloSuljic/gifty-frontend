@@ -3,7 +3,7 @@ import { useAuth } from "../components/AuthProvider";
 import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Modal from "./ui/Modal";
-import { FiTrash2, FiShare2, FiPlus } from "react-icons/fi";
+import { FiTrash2, FiLink, FiPlus } from "react-icons/fi";
 import ConfirmDeleteModal from "./ui/ConfirmDeleteModal";
 import ShareLinkModal from "./ui/ShareLinkModal";
 
@@ -242,7 +242,7 @@ const Wishlist = () => {
                     <FiTrash2 size={20} />
                   </button>
                   <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
-                    <FiShare2 size={20} />
+                    <FiLink size={20} />
                   </button>
                 </div>
               </div>

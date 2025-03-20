@@ -1,5 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { GoogleAuthProvider, onAuthStateChanged, signOut, User as FirebaseUser, signInWithPopup } from "firebase/auth";
+import { 
+  GoogleAuthProvider, 
+  onAuthStateChanged, 
+  signOut, 
+  signInWithPopup, 
+  createUserWithEmailAndPassword, 
+  updateProfile,
+  User as FirebaseUser 
+} from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 
@@ -17,6 +25,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
+  register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -39,13 +48,52 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const loginWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      auth.useDeviceLanguage(); // ✅ Fix popup COOP issue
+      auth.useDeviceLanguage();
       await signInWithPopup(auth, provider);
       navigate("/dashboard");
     } catch (error) {
       console.error("Google Sign-In Error", error);
     }
-  };  
+  };
+
+  const register = async (email: string, password: string, username: string) => {
+    try {
+      // ✅ Create user with Firebase Auth
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // ✅ Set Firebase display name
+      await updateProfile(user, { displayName: username });
+
+      // ✅ Get Firebase user token
+      const token = await user.getIdToken();
+
+      // ✅ Send user data to backend
+      const response = await fetch("http://localhost:5140/api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id: user.uid, 
+          email: user.email,
+          username: username,
+          bio: "",
+          avatarUrl: ""
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register user in backend");
+      }
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration Error:", error);
+      alert("Failed to register. Please try again.");
+    }
+  };
 
   const logout = async () => {
     await signOut(auth);
@@ -54,7 +102,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, loading, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ firebaseUser, loading, loginWithGoogle, register, logout }}>
       {loading ? <p className="text-center mt-10">Loading...</p> : children}
     </AuthContext.Provider>
   );
