@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthProvider";
 import { GiftyUser } from "../components/PrivateRoute";
+import { apiFetch } from "../api";
 
 const DashboardHeader = () => {
   const { firebaseUser } = useAuth();
@@ -10,7 +11,7 @@ const DashboardHeader = () => {
     if (firebaseUser) {
       const fetchUserData = async () => {
         const token = await firebaseUser.getIdToken();
-        const response = await fetch(`http://localhost:5140/api/users/${firebaseUser.uid}`, {
+        const response = await apiFetch(`/api/users/${firebaseUser.uid}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

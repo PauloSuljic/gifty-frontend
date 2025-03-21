@@ -6,6 +6,7 @@ import Modal from "./ui/Modal";
 import { FiTrash2, FiLink, FiPlus } from "react-icons/fi";
 import ConfirmDeleteModal from "./ui/ConfirmDeleteModal";
 import ShareLinkModal from "./ui/ShareLinkModal";
+import { apiFetch } from "../api";
 
 // Define TypeScript types
 type WishlistType = {
@@ -49,7 +50,8 @@ const Wishlist = () => {
   const fetchWishlists = async () => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
-    const response = await fetch("http://localhost:5140/api/wishlists", {
+    const response = await apiFetch("/api/wishlists", {
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -63,7 +65,7 @@ const Wishlist = () => {
   const createWishlist = async () => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
-    const response = await fetch("http://localhost:5140/api/wishlists", {
+    const response = await apiFetch("/api/wishlists", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -84,7 +86,7 @@ const Wishlist = () => {
   
     const token = await firebaseUser.getIdToken();
     
-    const response = await fetch(`http://localhost:5140/api/wishlists/${wishlistToDelete.id}`, {
+    const response = await apiFetch(`/api/wishlists/${wishlistToDelete.id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -107,7 +109,8 @@ const Wishlist = () => {
   const fetchWishlistItems = async (wishlistId: string) => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
-    const response = await fetch(`http://localhost:5140/api/wishlist-items/${wishlistId}`, {
+    const response = await apiFetch(`/api/wishlist-items/${wishlistId}`, {
+      method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -126,7 +129,7 @@ const Wishlist = () => {
     if (!selectedWishlist) return;
 
     const token = await firebaseUser?.getIdToken();
-    const response = await fetch("http://localhost:5140/api/wishlist-items", {
+    const response = await apiFetch("/api/wishlist-items", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -155,7 +158,7 @@ const Wishlist = () => {
     const { id, wishlistId } = itemToDelete;
     const token = await firebaseUser.getIdToken();
 
-    const response = await fetch(`http://localhost:5140/api/wishlist-items/${id}`, {
+    const response = await apiFetch(`/api/wishlist-items/${id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
     });
@@ -172,7 +175,7 @@ const Wishlist = () => {
   const toggleReservation = async (wishlistId: string, itemId: string) => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
-    const response = await fetch(`http://localhost:5140/api/wishlist-items/${itemId}/reserve`, {
+    const response = await apiFetch(`/api/wishlist-items/${itemId}/reserve`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
     });
@@ -190,7 +193,7 @@ const Wishlist = () => {
 
   const generateShareLink = async (wishlistId: string) => {
     const token = await firebaseUser?.getIdToken();
-    const response = await fetch(`http://localhost:5140/api/shared-links/${wishlistId}/generate`, {
+    const response = await apiFetch(`/api/shared-links/${wishlistId}/generate`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });

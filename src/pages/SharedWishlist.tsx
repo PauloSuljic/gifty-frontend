@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import WishlistItem from "../components/WishlistItem";
 import { useAuth } from "../components/AuthProvider";
 import Card from "../components/ui/Card";
+import { apiFetch } from "../api";
 
 // ✅ Define TypeScript types
 type WishlistItemType = {
@@ -34,7 +35,7 @@ const SharedWishlist = () => {
       const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
 
       try {
-        const response = await fetch(`http://localhost:5140/api/shared-links/${shareCode}`, {
+        const response = await apiFetch(`/api/shared-links/${shareCode}`, {
           method: "GET",
           headers: headers
         });
@@ -62,7 +63,7 @@ const SharedWishlist = () => {
     const token = await firebaseUser?.getIdToken();
     if (!token) return alert("You need to be logged in to reserve items.");
 
-    const response = await fetch(`http://localhost:5140/api/wishlist-items/${itemId}/reserve`, {
+    const response = await apiFetch(`/api/wishlist-items/${itemId}/reserve`, {
       method: "PATCH",
       headers: { Authorization: `Bearer ${token}` },
     });

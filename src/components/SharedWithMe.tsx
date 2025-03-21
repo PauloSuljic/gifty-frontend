@@ -4,6 +4,7 @@ import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Layout from "./layout/Layout";
 import { toast } from "react-hot-toast";
+import { apiFetch } from "../api";
 
 type SharedWishlistItem = {
   id: string;
@@ -35,7 +36,7 @@ const SharedWithMe = () => {
 
     const fetchSharedWishlists = async () => {
       const token = await firebaseUser.getIdToken();
-      const response = await fetch("http://localhost:5140/api/shared-links/shared-with-me", {
+      const response = await apiFetch("/api/shared-links/shared-with-me", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -54,7 +55,7 @@ const SharedWithMe = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`http://localhost:5140/api/wishlist-items/${itemId}/reserve`, {
+      const response = await apiFetch(`/api/wishlist-items/${itemId}/reserve`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });

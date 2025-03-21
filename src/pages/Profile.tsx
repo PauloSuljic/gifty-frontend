@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../components/AuthProvider";
 import Layout from "../components/layout/Layout";
 import { toast } from "react-hot-toast";
+import { apiFetch } from "../api";
 
 const avatarOptions = [
   "/avatars/avatar1.png",
@@ -25,7 +26,7 @@ const Profile = () => {
 
     const fetchUserData = async () => {
       const token = await firebaseUser.getIdToken();
-      const response = await fetch(`http://localhost:5140/api/users/${firebaseUser.uid}`, {
+      const response = await apiFetch(`/api/users/${firebaseUser.uid}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -42,7 +43,7 @@ const Profile = () => {
   const handleUpdateProfile = async () => {
     const token = await firebaseUser?.getIdToken();
 
-    const response = await fetch(`http://localhost:5140/api/users/${firebaseUser?.uid}`, {
+    const response = await apiFetch(`/api/users/${firebaseUser?.uid}`, {
       method: "PUT",
       headers: { 
         "Content-Type": "application/json",

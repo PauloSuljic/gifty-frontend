@@ -10,6 +10,7 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../api";
 
 // Define user type from PostgreSQL
 export type GiftyUser = {
@@ -69,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const token = await user.getIdToken();
 
       // ✅ Send user data to backend
-      const response = await fetch("http://localhost:5140/api/users", {
+      const response = await apiFetch("/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
