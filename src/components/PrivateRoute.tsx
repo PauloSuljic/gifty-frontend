@@ -16,24 +16,23 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { firebaseUser, loading } = useAuth();
   const [user, setUser] = useState<GiftyUser | null>(null);
   const [fetching, setFetching] = useState(true);
-  const hasFetched = useRef(false); // ✅ Prevents multiple calls
+  const hasFetched = useRef(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!firebaseUser || hasFetched.current) return;
+      if (!firebaseUser || !firebaseUser.emailVerified || hasFetched.current) return;
       hasFetched.current = true;
-
       setFetching(true);
-    
+
       try {
         const token = await firebaseUser.getIdToken();
+
         let response = await apiFetch(`/api/users/${firebaseUser.uid}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-    
-        // ✅ If user does NOT exist (404 error), create user in database
+
         if (response.status === 404) {
-          console.log("User not found, creating new user...");
+          console.log("User not found, creating...");
           await apiFetch("/api/users", {
             method: "POST",
             headers: {
@@ -48,22 +47,22 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
               bio: "",
             }),
           });
-    
-          // Fetch again after creating user
+
+          // Try again
           response = await apiFetch(`/api/users/${firebaseUser.uid}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
         }
-    
+
         if (!response.ok) throw new Error("Failed to fetch user data");
-    
+
         const userData = await response.json();
         setUser({
           id: userData.id,
           username: userData.username || firebaseUser.displayName || "Unknown",
           bio: userData.bio || "",
           email: userData.email,
-          avatarUrl: ""
+          avatarUrl: userData.avatarUrl || "",
         });
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -75,8 +74,15 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     fetchUserData();
   }, [firebaseUser]);
 
+  // ✅ Block loading
   if (loading || fetching) return <p className="text-center mt-10">Loading...</p>;
 
+  // ✅ Redirect unverified users
+  if (firebaseUser && !firebaseUser.emailVerified && firebaseUser.providerData[0]?.providerId === "password") {
+    return <Navigate to="/verify-email" />;
+  }
+
+  // ✅ Allow route only if both auth and user data exist
   return firebaseUser && user ? children : <Navigate to="/login" />;
 };
 

@@ -6,11 +6,11 @@ import {
   signInWithPopup, 
   createUserWithEmailAndPassword, 
   updateProfile,
+  sendEmailVerification,
   User as FirebaseUser 
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../api";
 
 // Define user type from PostgreSQL
 export type GiftyUser = {
@@ -28,6 +28,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshFirebaseUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,39 +58,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const refreshFirebaseUser = async () => {
+    if (auth.currentUser) {
+      await auth.currentUser.reload();
+      setFirebaseUser(auth.currentUser);
+    }
+  };  
+
   const register = async (email: string, password: string, username: string) => {
     try {
-      // ✅ Create user with Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // ✅ Set Firebase display name
+  
+      // ✅ Set display name in Firebase profile
       await updateProfile(user, { displayName: username });
-
-      // ✅ Get Firebase user token
-      const token = await user.getIdToken();
-
-      // ✅ Send user data to backend
-      const response = await apiFetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id: user.uid, 
-          email: user.email,
-          username: username,
-          bio: "",
-          avatarUrl: ""
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to register user in backend");
-      }
-
-      navigate("/dashboard");
+  
+      // ✅ Send verification email
+      await sendEmailVerification(user);
+  
+      // ⚠️ Do NOT register the user in your backend yet
+      // Instead, wait until they're verified
+  
+      // ✅ Navigate to verify email screen
+      navigate("/verify-email");
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Failed to register. Please try again.");
@@ -103,7 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, loading, loginWithGoogle, register, logout }}>
+    <AuthContext.Provider value={{ firebaseUser, loading, loginWithGoogle, register, logout, refreshFirebaseUser }}>
       {loading ? <p className="text-center mt-10">Loading...</p> : children}
     </AuthContext.Provider>
   );

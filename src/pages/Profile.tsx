@@ -17,7 +17,7 @@ const avatarOptions = [
 ];
 
 const Profile = () => {
-  const { firebaseUser } = useAuth();
+  const { firebaseUser, refreshFirebaseUser } = useAuth();
   const [user, setUser] = useState({ username: "", bio: "", avatarUrl: "" });
   const [selectedAvatar, setSelectedAvatar] = useState("");
 
@@ -60,7 +60,8 @@ const Profile = () => {
       toast.error("Failed to update profile 😞");
       return;
     }
-  
+    
+    await refreshFirebaseUser();
     toast.success("Profile updated successfully! 🎉");
   };
 
