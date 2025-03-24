@@ -1,3 +1,5 @@
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+
 type WishlistItemProps = {
     id: string;
     name: string;
@@ -8,6 +10,7 @@ type WishlistItemProps = {
     currentUser?: string; // ✅ Currently logged-in user (empty if guest)
     onToggleReserve: () => void;
     onDelete?: () => void; // ✅ Optional delete function
+    onEdit?: () => void;
   };
   
   const WishlistItem = ({
@@ -18,7 +21,8 @@ type WishlistItemProps = {
     wishlistOwner,
     currentUser,
     onToggleReserve,
-    onDelete
+    onDelete,
+    onEdit
   }: WishlistItemProps) => {
     const isGuest = !currentUser; // ✅ Guest users can't reserve/unreserve
     const isOwner = wishlistOwner === currentUser; // ✅ Is the logged-in user the owner?
@@ -64,9 +68,22 @@ type WishlistItemProps = {
   
           {/* ✅ Only show delete button for the wishlist owner */}
           {canDelete && (
-            <button className="px-4 py-2 bg-red-500 rounded-lg transition hover:bg-red-600" onClick={onDelete}>
-              Delete
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={onEdit}
+                className="text-blue-500 hover:text-blue-600 transition"
+                title="Edit Item"
+              >
+                <FiEdit size={20} />
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-red-500 hover:text-red-700 transition"
+                title="Delete Item"
+              >
+                <FiTrash2 size={20} />
+              </button>
+            </div>
           )}
         </div>
       </div>
