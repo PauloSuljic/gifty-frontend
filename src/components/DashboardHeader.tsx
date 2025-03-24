@@ -6,6 +6,7 @@ import { apiFetch } from "../api";
 const DashboardHeader = () => {
   const { firebaseUser } = useAuth();
   const [user, setUser] = useState<GiftyUser | null>(null);
+  const { databaseUser } = useAuth();
 
   useEffect(() => {
     if (firebaseUser) {
@@ -26,14 +27,14 @@ const DashboardHeader = () => {
 
   return (
     <div className="flex items-center justify-between p-4 bg-gray-800 text-white rounded-lg shadow-lg">
-      <div className="flex items-center">
-        <img src={user?.avatarUrl} alt="Avatar" className="w-15 h-15 rounded-full mr-3" />
-        <div>
-          <h2 className="text-xl font-bold">{user?.username || "Guest"}</h2>
-          <p className="text-gray-400">{user?.bio || "No bio available"}</p>
-        </div>
+    <div className="flex items-center">
+      <img src={databaseUser?.avatarUrl} alt="Avatar" className="w-15 h-15 rounded-full mr-3" />
+      <div>
+        <h2 className="text-xl font-bold">{databaseUser?.username || "Guest"}</h2>
+        <p className="text-gray-400">{databaseUser?.bio || "No bio available"}</p>
       </div>
     </div>
+  </div>
   );
 };
 

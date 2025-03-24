@@ -3,10 +3,11 @@ import { useAuth } from "../components/AuthProvider";
 import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Modal from "./ui/Modal";
-import { FiTrash2, FiLink, FiPlus } from "react-icons/fi";
+import { FiTrash2, FiLink, FiPlus, FiEdit } from "react-icons/fi";
 import ConfirmDeleteModal from "./ui/ConfirmDeleteModal";
 import ShareLinkModal from "./ui/ShareLinkModal";
 import { apiFetch } from "../api";
+import toast from "react-hot-toast";
 
 // Define TypeScript types
 type WishlistType = {
@@ -42,6 +43,19 @@ const Wishlist = () => {
 
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+
+  // 🔽 New state for edit functionality
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [itemToEdit, setItemToEdit] = useState<{ id: string; name: string; link: string; wishlistId: string }>({
+    id: "",
+    name: "",
+    link: "",
+    wishlistId: ""
+  });
+
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [wishlistToRename, setWishlistToRename] = useState<{ id: string; name: string } | null>(null);
+  const [newWishlistName, setNewWishlistName] = useState("");
 
   useEffect(() => {
     if (firebaseUser) fetchWishlists();
@@ -209,6 +223,79 @@ const Wishlist = () => {
     }
   };
 
+  // 🔽 Function to open edit modal
+  const openEditModal = (item: WishlistItemType, wishlistId: string) => {
+    setItemToEdit({ id: item.id, name: item.name, link: item.link, wishlistId });
+    setIsEditModalOpen(true);
+  };
+
+  // 🔽 Function to update wishlist item
+  const updateWishlistItem = async () => {
+    const token = await firebaseUser?.getIdToken();
+    if (!token) return;
+
+    const response = await apiFetch(`/api/wishlist-items/${itemToEdit.id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: itemToEdit.name,
+        link: itemToEdit.link
+      })
+    });
+
+    if (response.ok) {
+      const updated = await response.json();
+      setWishlistItems((prev) => ({
+        ...prev,
+        [itemToEdit.wishlistId]: prev[itemToEdit.wishlistId].map((item) =>
+          item.id === updated.id ? updated : item
+        )
+      }));
+      setIsEditModalOpen(false);
+      toast.success("Item updated!", {
+        position: "bottom-center",
+        duration: 3000,
+        icon: "✅",
+      });
+    } else {
+      console.error("Failed to update item:", await response.json());
+      toast.error("Something went wrong!", {
+        position: "bottom-center",
+        duration: 3000,
+        icon: "❌",
+      });
+    }
+  };
+
+  const renameWishlist = async () => {
+    if (!firebaseUser || !wishlistToRename || !newWishlistName.trim()) return;
+  
+    const token = await firebaseUser.getIdToken();
+  
+    const response = await apiFetch(`/api/wishlists/${wishlistToRename.id}`, {
+      method: "PATCH",
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newWishlistName)
+    });
+  
+    if (response.ok) {
+      toast.success("Wishlist renamed!");
+      fetchWishlists(); // refresh
+      setIsRenameModalOpen(false);
+      setWishlistToRename(null);
+      setNewWishlistName("");
+    } else {
+      toast.error("Failed to rename wishlist.");
+    }
+  };
+  
+
   return (
     <div className="max-w-4xl mx-auto text-white">
       {/* Create New Wishlist */}
@@ -237,15 +324,26 @@ const Wishlist = () => {
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold">{wishlist.name}</h3>
                 <div className="flex space-x-2">
+                <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
+                    <FiLink size={20} />
+                </button>
+                <button
+                    onClick={() => {
+                      setWishlistToRename({ id: wishlist.id, name: wishlist.name });
+                      setNewWishlistName(wishlist.name);
+                      setIsRenameModalOpen(true);
+                    }}
+                    className="text-blue-500 hover:text-blue-600 transition"
+                    title="Rename Wishlist"
+                  >
+                    <FiEdit size={20} />
+                  </button>
                   <button onClick={() => {
                             setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
                             setIsWishlistDeleteModalOpen(true);
                           }}
                           className="text-red-500 hover:text-red-700 transition">
                     <FiTrash2 size={20} />
-                  </button>
-                  <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
-                    <FiLink size={20} />
                   </button>
                 </div>
               </div>
@@ -266,25 +364,26 @@ const Wishlist = () => {
               <div className="mt-4 space-y-3">
                 {wishlistItems[wishlist.id]?.map((item) => (
                   <WishlistItem
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    link={item.link}
-                    isReserved={item.isReserved}
-                    reservedBy={item.reservedBy}
-                    wishlistOwner={wishlist.userId}
-                    currentUser={firebaseUser?.uid}
-                    onDelete={() => {
-                      setItemToDelete({
-                        id: item.id,
-                        name: item.name,
-                        wishlistId: wishlist.id,
-                        wishlistName: wishlist.name
-                      });
-                      setIsDeleteModalOpen(true);
-                    }}
-                    onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                  />
+                  key={item.id}
+                  id={item.id}
+                  name={item.name}
+                  link={item.link}
+                  isReserved={item.isReserved}
+                  reservedBy={item.reservedBy}
+                  wishlistOwner={wishlist.userId}
+                  currentUser={firebaseUser?.uid}
+                  onDelete={() => {
+                    setItemToDelete({
+                      id: item.id,
+                      name: item.name,
+                      wishlistId: wishlist.id,
+                      wishlistName: wishlist.name
+                    });
+                    setIsDeleteModalOpen(true);
+                  }}
+                  onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                  onEdit={() => openEditModal(item, wishlist.id)} // 🔽 NEW
+                />                
                 ))}
               </div>
             </Card>
@@ -300,6 +399,42 @@ const Wishlist = () => {
         <input type="text" placeholder="Item Name" value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-2" />
         <input type="text" placeholder="Item Link" value={newItem.link} onChange={(e) => setNewItem({ ...newItem, link: e.target.value })} className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4" />
         <button onClick={addWishlistItem} className="px-4 py-2 bg-purple-500 rounded-lg w-full">Confirm</button>
+      </Modal>
+
+      {/* ✅ Modal for Editing Items */}
+      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4">Edit Item</h2>
+        <input
+          type="text"
+          placeholder="Item Name"
+          value={itemToEdit.name}
+          onChange={(e) => setItemToEdit({ ...itemToEdit, name: e.target.value })}
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-2"
+        />
+        <input
+          type="text"
+          placeholder="Item Link"
+          value={itemToEdit.link}
+          onChange={(e) => setItemToEdit({ ...itemToEdit, link: e.target.value })}
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4"
+        />
+        <button onClick={updateWishlistItem} className="px-4 py-2 bg-purple-500 rounded-lg w-full">
+          Save Changes
+        </button>
+      </Modal>
+
+      <Modal isOpen={isRenameModalOpen} onClose={() => setIsRenameModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4">Rename Wishlist</h2>
+        <input
+          type="text"
+          placeholder="New wishlist name"
+          value={newWishlistName}
+          onChange={(e) => setNewWishlistName(e.target.value)}
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4"
+        />
+        <button onClick={renameWishlist} className="px-4 py-2 bg-purple-500 rounded-lg w-full">
+          Save Changes
+        </button>
       </Modal>
 
       {/* ✅ Delete Confirmation Modal */}

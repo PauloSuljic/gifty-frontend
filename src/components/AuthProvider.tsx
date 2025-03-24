@@ -1,18 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { 
-  GoogleAuthProvider, 
-  onAuthStateChanged, 
-  signOut, 
-  signInWithPopup, 
-  createUserWithEmailAndPassword, 
+import {
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signOut,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
   updateProfile,
-  User as FirebaseUser 
+  sendEmailVerification,
+  User as FirebaseUser
 } from "firebase/auth";
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
 
-// Define user type from PostgreSQL
+// ✅ Define PostgreSQL User
 export type GiftyUser = {
   id: string;
   email: string;
@@ -21,30 +22,68 @@ export type GiftyUser = {
   avatarUrl: string;
 };
 
-// Context Type
+// ✅ Define context type
 interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   loading: boolean;
   loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, username: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshFirebaseUser: () => Promise<void>;
+  databaseUser: GiftyUser | null;
+  refreshDatabaseUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [databaseUser, setDatabaseUser] = useState<GiftyUser | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // 🔄 Refetch user from backend (PostgreSQL)
+  const fetchDatabaseUser = async (token: string, uid: string) => {
+    const res = await apiFetch(`/api/users/${uid}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setDatabaseUser(data);
+    }
+  };
+
+  // ✅ Firebase auth state listener
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       setLoading(false);
+
+      if (user) {
+        const token = await user.getIdToken();
+        await fetchDatabaseUser(token, user.uid);
+      } else {
+        setDatabaseUser(null);
+      }
     });
 
     return () => unsubscribe();
   }, []);
+
+  const refreshDatabaseUser = async () => {
+    if (firebaseUser) {
+      const token = await firebaseUser.getIdToken();
+      await fetchDatabaseUser(token, firebaseUser.uid);
+    }
+  };
+
+  const refreshFirebaseUser = async () => {
+    if (auth.currentUser) {
+      await auth.currentUser.reload();
+      setFirebaseUser(auth.currentUser);
+    }
+  };
 
   const loginWithGoogle = async () => {
     try {
@@ -59,37 +98,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const register = async (email: string, password: string, username: string) => {
     try {
-      // ✅ Create user with Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // ✅ Set Firebase display name
       await updateProfile(user, { displayName: username });
+      await sendEmailVerification(user);
 
-      // ✅ Get Firebase user token
-      const token = await user.getIdToken();
-
-      // ✅ Send user data to backend
-      const response = await apiFetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          id: user.uid, 
-          email: user.email,
-          username: username,
-          bio: "",
-          avatarUrl: ""
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to register user in backend");
-      }
-
-      navigate("/dashboard");
+      navigate("/verify-email");
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Failed to register. Please try again.");
@@ -99,11 +114,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = async () => {
     await signOut(auth);
     setFirebaseUser(null);
+    setDatabaseUser(null);
     navigate("/");
   };
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, loading, loginWithGoogle, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        firebaseUser,
+        loading,
+        loginWithGoogle,
+        register,
+        logout,
+        refreshFirebaseUser,
+        databaseUser,
+        refreshDatabaseUser,
+      }}
+    >
       {loading ? <p className="text-center mt-10">Loading...</p> : children}
     </AuthContext.Provider>
   );
@@ -111,8 +138,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 };

@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import SharedWithMe from "./components/SharedWithMe";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "react-hot-toast";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => {
   return (
@@ -44,6 +45,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         {/* Private Routes (Require Authentication) */}
         <Route

@@ -17,7 +17,7 @@ const avatarOptions = [
 ];
 
 const Profile = () => {
-  const { firebaseUser } = useAuth();
+  const { firebaseUser, refreshDatabaseUser } = useAuth();
   const [user, setUser] = useState({ username: "", bio: "", avatarUrl: "" });
   const [selectedAvatar, setSelectedAvatar] = useState("");
 
@@ -45,14 +45,14 @@ const Profile = () => {
 
     const response = await apiFetch(`/api/users/${firebaseUser?.uid}`, {
       method: "PUT",
-      headers: { 
+      headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ 
-        username: user.username, 
-        bio: user.bio, 
-        avatarUrl: selectedAvatar 
+      body: JSON.stringify({
+        username: user.username,
+        bio: user.bio,
+        avatarUrl: selectedAvatar
       })
     });
 
@@ -60,20 +60,19 @@ const Profile = () => {
       toast.error("Failed to update profile 😞");
       return;
     }
-  
+
     toast.success("Profile updated successfully! 🎉");
+
+    await refreshDatabaseUser(); // ✅ This updates the header instantly
   };
 
   return (
     <Layout>
       <h2 className="text-3xl font-semibold pt-6 text-center">Edit Profile</h2>
-      <div className="mx-auto p-6 text-white w-full max-w-3xl">
-        {/* Profile Content - Side by Side */}
-        <div className="flex justify-center gap-20">
-          
-          {/* Left Column: Username & Bio */}
-          <div className="w-80 pt-10">
-            {/* Username */}
+      <div className="mx-auto p-4 text-white w-full max-w-4xl">
+        <div className="flex flex-col md:flex-row justify-center gap-10">
+          {/* Left: Username & Bio */}
+          <div className="w-full md:w-1/2">
             <div className="mb-4">
               <label className="block text-gray-400">Username</label>
               <input
@@ -85,7 +84,6 @@ const Profile = () => {
               />
             </div>
   
-            {/* Bio */}
             <div className="mb-4">
               <label className="block text-gray-400">Bio</label>
               <textarea
@@ -97,10 +95,10 @@ const Profile = () => {
             </div>
           </div>
   
-          {/* Right Column: Avatar Selection */}
-          <div className="flex flex-col items-center">
-            <label className="block text-gray-400 mb-2">Select Avatar</label>
-            <div className="grid grid-cols-3 gap-3">
+          {/* Right: Avatars */}
+          <div className="w-full md:w-1/2 flex flex-col items-center">
+            <label className="block text-gray-400 mb-3">Select Avatar</label>
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
               {avatarOptions.map((avatar) => (
                 <img
                   key={avatar}
@@ -125,7 +123,7 @@ const Profile = () => {
         </button>
       </div>
     </Layout>
-  );
+  );  
   
 };
 
