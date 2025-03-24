@@ -5,7 +5,7 @@ import { apiFetch } from "../api";
 
 const DashboardHeader = () => {
   const { firebaseUser } = useAuth();
-  const [user, setUser] = useState<GiftyUser | null>(null);
+  const [, setUser] = useState<GiftyUser | null>(null);
   const { databaseUser } = useAuth();
 
   useEffect(() => {
