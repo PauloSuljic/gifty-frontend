@@ -68,7 +68,7 @@ type WishlistItemProps = {
   
           {/* ✅ Only show delete button for the wishlist owner */}
           {canDelete && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <button
                 onClick={onEdit}
                 className="text-blue-500 hover:text-blue-600 transition"

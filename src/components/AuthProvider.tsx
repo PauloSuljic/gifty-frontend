@@ -12,6 +12,8 @@ import {
 import { auth } from "../firebase/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../api";
+import toast from "react-hot-toast";
+import Spinner from "./ui/Spinner";
 
 // ✅ Define PostgreSQL User
 export type GiftyUser = {
@@ -107,7 +109,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       navigate("/verify-email");
     } catch (error) {
       console.error("Registration Error:", error);
-      alert("Failed to register. Please try again.");
+      toast.error("Failed to register. Please try again.", {
+        duration: 3000,
+        position: "bottom-center"
+      });
     }
   };
 
@@ -131,7 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         refreshDatabaseUser,
       }}
     >
-      {loading ? <p className="text-center mt-10">Loading...</p> : children}
+      {loading ? <Spinner /> : children}
     </AuthContext.Provider>
   );
 };

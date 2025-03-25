@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider";
 import { useEffect, useState, useRef } from "react";
 import { apiFetch } from "../api";
+import Spinner from "./ui/Spinner";
 
 // Define our database user type
 export type GiftyUser = {
@@ -75,7 +76,9 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   }, [firebaseUser]);
 
   // ✅ Block loading
-  if (loading || fetching) return <p className="text-center mt-10">Loading...</p>;
+  if (loading || fetching) {
+    return <Spinner />
+  } 
 
   // ✅ Redirect unverified users
   if (firebaseUser && !firebaseUser.emailVerified && firebaseUser.providerData[0]?.providerId === "password") {

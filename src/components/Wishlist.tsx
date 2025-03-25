@@ -136,7 +136,10 @@ const Wishlist = () => {
 
   const addWishlistItem = async () => {
     if (!newItem.name.trim() || !newItem.link.trim()) {
-      alert("Please enter both item name and link.");
+      toast.error("Please enter both item name and link.", {
+        duration: 3000,
+        position: "bottom-center"
+      });
       return;
     }
 
@@ -323,7 +326,7 @@ const Wishlist = () => {
               {/* Wishlist Title & Actions */}
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold">{wishlist.name}</h3>
-                <div className="flex space-x-2">
+                <div className="flex space-x-3">
                 <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
                     <FiLink size={20} />
                 </button>

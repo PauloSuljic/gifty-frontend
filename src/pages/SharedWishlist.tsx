@@ -3,6 +3,9 @@ import { useParams, Link } from "react-router-dom";
 import { useAuth } from "../components/AuthProvider";
 import Card from "../components/ui/Card";
 import { apiFetch } from "../api";
+import toast from "react-hot-toast";
+import { FiLock } from "react-icons/fi";
+import Spinner from "../components/ui/Spinner";
 
 // ✅ Define TypeScript types
 type WishlistItemType = {
@@ -60,7 +63,13 @@ const SharedWishlist = () => {
 
   const toggleReservation = async (itemId: string) => {
     const token = await firebaseUser?.getIdToken();
-    if (!token) return alert("You need to be logged in to reserve items.");
+    if (!token) {
+      toast.error("You need to be logged in to reserve items.", {
+        duration: 3000,
+        position: "bottom-center"
+      });
+      return;
+    }
 
     const response = await apiFetch(`/api/wishlist-items/${itemId}/reserve`, {
       method: "PATCH",
@@ -88,111 +97,121 @@ const SharedWishlist = () => {
     }
   };
 
-  if (loading) return <p className="text-white text-center">Loading...</p>;
+  if (loading) {
+     return <Spinner />
+  }  
   if (!wishlist) return <p className="text-gray-300 text-center mt-6">Invalid or expired shared link.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6 text-white">
-      {/* 🎁 Wishlist Header */}
-      <Card className="p-6 bg-gray-800 flex items-center gap-4">
-        <img
-          src={wishlist.ownerAvatarUrl || "/avatars/avatar1.png"}
-          alt="Sharer Avatar"
-          className="w-14 h-14 rounded-full border border-white/20"
-        />
-        <div>
-          <h2 className="text-3xl font-bold text-purple-400">{wishlist.name}</h2>
-          <p className="text-gray-300 mt-1">
-            Shared by:{" "}
-            <span className="text-white font-medium">
-              {wishlist.ownerId === firebaseUser?.uid ? "You" : wishlist.ownerName || "Unknown"}
-            </span>
-          </p>
-        </div>
-      </Card>
-
-      {/* 🔐 Login/Register suggestion */}
-      {!firebaseUser && (
-        <div className="bg-yellow-900/40 border border-yellow-600 rounded-lg mt-6 p-4 text-center">
-          <p className="text-yellow-300 text-sm mb-3">
-            Want to reserve gifts or track your own wishlists?
-          </p>
-          <div className="flex justify-center space-x-4">
-            <Link
-              to="/login"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded transition"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition"
-            >
-              Create Account
-            </Link>
+    <div className="max-w-4xl mx-auto px-4 py-8 text-white">
+      {/* 🎁 Gifty Logo */}
+      <div className="text-center mb-6">
+        <h1 className="text-5xl text-purple-400 font-tually border border-purple rounded-2xl inline-block px-6 py-2">
+          Gifty
+        </h1>
+      </div>
+  
+      {/* 📋 Wishlist Card (with items nested inside) */}
+      <Card className="p-6 bg-gray-800">
+        {/* Header: Sharer Info */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6">
+          <img
+            src={wishlist.ownerAvatarUrl || "/avatars/avatar1.png"}
+            alt="Sharer Avatar"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white/20"
+          />
+          <div className="text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-bold text-purple-400">{wishlist.name}</h2>
+            <p className="text-gray-300 mt-1">
+              Shared by:{" "}
+              <span className="text-white font-medium">
+                {wishlist.ownerId === firebaseUser?.uid ? "You" : wishlist.ownerName || "Unknown"}
+              </span>
+            </p>
           </div>
         </div>
-      )}
-
-      {/* 📦 Wishlist Items */}
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+  
+        {/* 🔗 CTA Button */}
+        <div className="text-center mb-6">
+          <Link
+            to={firebaseUser ? "/dashboard" : "/"}
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition text-lg font-medium shadow-md inline-block"
+          >
+            {firebaseUser ? "Go to Dashboard" : "Open Gifty App"}
+          </Link>
+        </div>
+  
+        {/* 🧾 Wishlist Items */}
         {wishlist.items.length > 0 ? (
-          wishlist.items.map((item) => {
-            const isReserver = item.reservedBy === firebaseUser?.uid;
-            const isGuest = !firebaseUser;
-
-            return (
-              <Card key={item.id} className="p-4 bg-gray-800 flex flex-col justify-between space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">{item.name}</h3>
-                  <a
-                    href={item.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 text-sm underline"
-                  >
-                    View Item ↗
-                  </a>
+          <div className="space-y-4">
+            {wishlist.items.map((item) => {
+              const isReserver = item.reservedBy === firebaseUser?.uid;
+              const isGuest = !firebaseUser;
+              const isReserved = item.isReserved;
+  
+              return (
+                <div
+                  key={item.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between bg-white/5 p-4 rounded-lg border border-white/10"
+                >
+                  {/* Name & Link */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-lg font-semibold">{item.name}</h3>
+                      {isReserved && <FiLock className="text-red-400" title="Item reserved" />}
+                    </div>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 text-sm underline break-all"
+                    >
+                      View Item ↗
+                    </a>
+                  </div>
+  
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-center mt-3 sm:mt-0">
+                    {isReserved ? (
+                      <span
+                        className={`text-sm px-3 py-1 rounded-full flex items-center gap-2 ${
+                          isReserver ? "bg-green-700" : "bg-red-700"
+                        }`}
+                      >
+                        <FiLock size={14} />
+                        {isReserver ? "You reserved this" : "Reserved"}
+                      </span>
+                    ) : isGuest ? (
+                      <span className="text-sm text-red-400 italic">Login to reserve</span>
+                    ) : (
+                      <button
+                        onClick={() => toggleReservation(item.id)}
+                        className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm"
+                      >
+                        Reserve
+                      </button>
+                    )}
+  
+                    {isReserver && (
+                      <button
+                        onClick={() => toggleReservation(item.id)}
+                        className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
+                      >
+                        Unreserve
+                      </button>
+                    )}
+                  </div>
                 </div>
-
-                <div className="flex justify-between items-center">
-                  {item.isReserved ? (
-                    <span
-                      className={`text-sm px-3 py-1 rounded-full ${
-                        isReserver ? "bg-green-700" : "bg-red-700"
-                      }`}
-                    >
-                      {isReserver ? "You reserved this" : "Reserved"}
-                    </span>
-                  ) : isGuest ? (
-                    <span className="text-sm text-red-400 italic">Login to reserve</span>
-                  ) : (
-                    <button
-                      onClick={() => toggleReservation(item.id)}
-                      className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg text-sm"
-                    >
-                      Reserve
-                    </button>
-                  )}
-
-                  {isReserver && (
-                    <button
-                      onClick={() => toggleReservation(item.id)}
-                      className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg text-sm"
-                    >
-                      Unreserve
-                    </button>
-                  )}
-                </div>
-              </Card>
-            );
-          })
+              );
+            })}
+          </div>
         ) : (
           <p className="text-gray-400 text-center">No items in this wishlist.</p>
         )}
-      </div>
+      </Card>
     </div>
-  );
+  );    
+  
 };
 
 export default SharedWishlist;
