@@ -16,7 +16,7 @@
 <p align="center">
   <img src="./public/screenshots/dashboard.png" width="700" />
   <br/>
-  <img src="./public/screenshots/profile-mobile.png" width="300" />
+  <img src="./public/screenshots/dashboard-mobile.png" width="300" />
 </p>
 
 ---
