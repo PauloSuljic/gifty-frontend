@@ -1,54 +1,91 @@
-# React + TypeScript + Vite
+# 🎁 Gifty Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> A modern, responsive wishlist sharing app built with **React**, **Firebase**, and **Tailwind CSS**.  
+> Create wishlists, share them with friends, and reserve gifts seamlessly — even for guests.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🌐 Live Demo
 
-## Expanding the ESLint configuration
+👉 [https://gifty.yourdomain.com](https://nice-field-033302003.6.azurestaticapps.net) 
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 📸 Screenshots
+
+<p align="center">
+  <img src="./public/screenshots/dashboard.png" width="700" />
+  <br/>
+  <img src="./public/screenshots/profile-mobile.png" width="300" />
+</p>
+
+---
+
+## ⚙️ Tech Stack
+
+- ⚛️ **React + Vite + TypeScript**
+- 💅 **Tailwind CSS**
+- 🔐 **Firebase Auth** (Email/Password + Google)
+- 📦 **Custom REST API** (via ASP.NET backend)
+- 🌐 **Azure Static Web Apps** (CI/CD deployment)
+
+---
+
+## ✨ Features
+
+- 🔐 Authentication with email verification & Google login
+- 🧾 Wishlist creation, editing, deletion
+- 🔗 Shareable wishlist links (guests can view & users can view + reserve)
+- ✅ Reservation logic (1 item per wishlist per user)
+- 👤 Editable profile with bio and avatar
+- 📱 Fully responsive mobile-first UI
+- 🍞 Toast notifications for feedback
+- 🧭 Route protection with smooth loading animations
+
+---
+
+## 📁 Folder Structure
+```
+src/
+├── components/        # Reusable components (Sidebar, Layout)
+├── pages/             # Login, Register, Profile, SharedWishlist
+├── firebase/          # Firebase config
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🧪 Development
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
 ```
+git clone https://github.com/paulo-suljic/gifty-frontend
+cd gifty-frontend
+npm install
+npm run dev
+```
+
+Create a .env file:
+
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_API_BASE_URL=https://gifty-api.azurewebsites.net
+```
+
+---
+
+## 🚀 Build for Production
+```
+npm run build
+```
+
+---
+
+## 🛡 Security
+- Auth state is validated using Firebase ID tokens
+- Protected routes using PrivateRoute
+- Email must be verified before access
+
+---
+
+## 🤝 Contributing
+Open to PRs, ideas, and feedback — just fork and submit a pull request!
