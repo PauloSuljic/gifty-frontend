@@ -54,7 +54,7 @@ jobs:
           action: "upload"
           app_location: "/"           
           output_location: "dist"     
-          api_location: ""  
+          api_location: ""
           skip_app_build: true 
 
   close_pull_request_job:
