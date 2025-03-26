@@ -7,7 +7,7 @@
 
 ## 🌐 Live Demo
 
-👉 [https://nice-field-033302003.6.azurestaticapps.net](https://nice-field-033302003.6.azurestaticapps.net)
+👉 [https://giftyapp.live](https://giftyapp.live)
 
 ---
 
