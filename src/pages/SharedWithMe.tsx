@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "./AuthProvider";
-import Card from "./ui/Card";
-import WishlistItem from "./WishlistItem";
-import Layout from "./layout/Layout";
+import { useAuth } from "../components/AuthProvider";
+import Card from "../components/ui/Card";
+import WishlistItem from "../components/WishlistItem";
+import Layout from "../components/layout/Layout";
 import { toast } from "react-hot-toast";
 import { apiFetch } from "../api";
 
@@ -107,6 +107,7 @@ const SharedWithMe = () => {
   return (
     <Layout>
       <h2 className="text-3xl font-semibold pt-6 text-center">Wishlists Shared With Me</h2>
+      <div className="mx-auto p-4 text-white w-full max-w-4xl">
       {sharedWishlists.length === 0 ? (
         <p className="text-gray-300 text-center mt-6">No shared wishlists yet.</p>
       ) : (
@@ -145,6 +146,7 @@ const SharedWithMe = () => {
           </div>
         ))
       )}
+      </div>
     </Layout>
   );
 };

@@ -7,7 +7,7 @@ import SharedWishlist from "./pages/SharedWishlist";
 import PrivateRoute from "./components/PrivateRoute";
 import NotFound from "./pages/NotFound";
 import Profile from "./pages/Profile";
-import SharedWithMe from "./components/SharedWithMe";
+import SharedWithMe from "./pages/SharedWithMe";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "react-hot-toast";
 import VerifyEmail from "./pages/VerifyEmail";

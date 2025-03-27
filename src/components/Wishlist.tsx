@@ -298,16 +298,15 @@ const Wishlist = () => {
     }
   };
   
-
   return (
-    <div className="max-w-4xl mx-auto text-white">
+    <div className="max-w-4xl mx-auto text-white px-4"> {/* 👈 Add padding for mobile edge spacing */}
       {/* Create New Wishlist */}
-      <div className="flex items-center space-x-4 mb-6">
+      <div className="flex flex-wrap gap-3 mb-6">
         <input
           value={newWishlist}
           onChange={(e) => setNewWishlist(e.target.value)}
           placeholder="New Wishlist Name"
-          className="flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
+          className="flex-grow min-w-[200px] px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
         />
         <button
           onClick={createWishlist}
@@ -317,20 +316,20 @@ const Wishlist = () => {
           Create
         </button>
       </div>
-
+  
       {/* Display Wishlists and Items */}
       {wishlists.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {wishlists.map((wishlist) => (
             <Card key={wishlist.id} className="relative">
               {/* Wishlist Title & Actions */}
-              <div className="flex justify-between items-center">
-                <h3 className="text-xl font-semibold">{wishlist.name}</h3>
-                <div className="flex space-x-3">
-                <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
+              <div className="flex justify-between items-center flex-wrap gap-2">
+                <h3 className="text-xl font-semibold break-words">{wishlist.name}</h3>
+                <div className="flex flex-wrap gap-2 justify-end">
+                  <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
                     <FiLink size={20} />
-                </button>
-                <button
+                  </button>
+                  <button
                     onClick={() => {
                       setWishlistToRename({ id: wishlist.id, name: wishlist.name });
                       setNewWishlistName(wishlist.name);
@@ -341,17 +340,19 @@ const Wishlist = () => {
                   >
                     <FiEdit size={20} />
                   </button>
-                  <button onClick={() => {
-                            setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
-                            setIsWishlistDeleteModalOpen(true);
-                          }}
-                          className="text-red-500 hover:text-red-700 transition">
+                  <button
+                    onClick={() => {
+                      setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
+                      setIsWishlistDeleteModalOpen(true);
+                    }}
+                    className="text-red-500 hover:text-red-700 transition"
+                  >
                     <FiTrash2 size={20} />
                   </button>
                 </div>
               </div>
-
-              {/* Add Item Button (Opens Modal) */}
+  
+              {/* Add Item Button */}
               <button
                 onClick={() => {
                   setSelectedWishlist(wishlist.id);
@@ -362,31 +363,31 @@ const Wishlist = () => {
                 <FiPlus />
                 <span>Add Item</span>
               </button>
-
+  
               {/* Display Wishlist Items */}
               <div className="mt-4 space-y-3">
                 {wishlistItems[wishlist.id]?.map((item) => (
                   <WishlistItem
-                  key={item.id}
-                  id={item.id}
-                  name={item.name}
-                  link={item.link}
-                  isReserved={item.isReserved}
-                  reservedBy={item.reservedBy}
-                  wishlistOwner={wishlist.userId}
-                  currentUser={firebaseUser?.uid}
-                  onDelete={() => {
-                    setItemToDelete({
-                      id: item.id,
-                      name: item.name,
-                      wishlistId: wishlist.id,
-                      wishlistName: wishlist.name
-                    });
-                    setIsDeleteModalOpen(true);
-                  }}
-                  onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                  onEdit={() => openEditModal(item, wishlist.id)} // 🔽 NEW
-                />                
+                    key={item.id}
+                    id={item.id}
+                    name={item.name}
+                    link={item.link}
+                    isReserved={item.isReserved}
+                    reservedBy={item.reservedBy}
+                    wishlistOwner={wishlist.userId}
+                    currentUser={firebaseUser?.uid}
+                    onDelete={() => {
+                      setItemToDelete({
+                        id: item.id,
+                        name: item.name,
+                        wishlistId: wishlist.id,
+                        wishlistName: wishlist.name,
+                      });
+                      setIsDeleteModalOpen(true);
+                    }}
+                    onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                    onEdit={() => openEditModal(item, wishlist.id)}
+                  />
                 ))}
               </div>
             </Card>
@@ -395,7 +396,7 @@ const Wishlist = () => {
       ) : (
         <p className="text-gray-300 text-center">No wishlists found. Create one to get started!</p>
       )}
-
+  
       {/* Modal for Adding Items */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h2 className="text-xl font-bold mb-4">Add Item</h2>
@@ -462,7 +463,6 @@ const Wishlist = () => {
         onClose={() => setIsShareModalOpen(false)} 
         shareUrl={shareUrl}
       />
-
     </div>
   );
 };
