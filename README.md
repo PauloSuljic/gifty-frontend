@@ -7,7 +7,7 @@
 
 ## 🌐 Live Demo
 
-👉 [https://www.giftyapp.live](https://www.giftyapp.live)
+👉 [https://giftyapp.live](https://giftyapp.live)
 
 ---
 
