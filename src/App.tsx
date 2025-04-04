@@ -11,6 +11,7 @@ import SharedWithMe from "./pages/SharedWithMe";
 import { ToastContainer } from "react-toastify";
 import { Toaster } from "react-hot-toast";
 import VerifyEmail from "./pages/VerifyEmail";
+import SettingsPage from "./pages/Settings";
 
 const App = () => {
   return (
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="/shared/:shareCode" element={<SharedWishlist />} />
         <Route path="/shared-with-me" element={<PrivateRoute><SharedWithMe /></PrivateRoute>} />
         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
 
         {/* 404 Page */}
         <Route path="*" element={<NotFound />} />

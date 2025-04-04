@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { FiGift, FiLogOut, FiHome, FiUser, FiX } from "react-icons/fi";
+import { FiGift, FiLogOut, FiHome, FiUser, FiX, FiSettings } from "react-icons/fi";
 import { useAuth } from "../components/AuthProvider";
 
 type SidebarProps = {
@@ -37,9 +37,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           <FiX size={24} />
         </button>
 
-        <h2 className="p-3 m-3 text-5xl text-purple-400 font-tually border border-purple rounded-2xl flex items-center justify-center text-center">
+        <Link
+            to="/dashboard" className="p-3 m-3 text-5xl text-purple-400 font-tually border border-purple rounded-2xl flex items-center justify-center text-center">
           Gifty
-        </h2>
+        </Link>
         <nav className="mt-10 space-y-4">
           <Link to="/dashboard" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
             <FiHome size={20} /> <span>My Wishlists</span>
@@ -49,6 +50,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </Link>
           <Link to="/profile" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
             <FiUser size={20} /> <span>Profile</span>
+          </Link>
+          <Link to="/settings" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
+            <FiSettings size={20} /> <span>Settings</span>
           </Link>
         </nav>
 

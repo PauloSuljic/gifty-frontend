@@ -2,6 +2,7 @@ import { useState } from "react";
 import Sidebar from "../Sidebar";
 import DashboardHeader from "../DashboardHeader";
 import { FiMenu } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,9 +23,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <FiMenu size={24} />
           </button>
 
-          <h2 className="text-5xl text-purple-400 font-tually border border-purple rounded-2xl px-6 py-2 text-center">
+          <Link
+            to="/dashboard"
+            className="text-5xl text-purple-400 font-tually border border-purple rounded-2xl px-6 py-2 text-center"
+          >
             Gifty
-          </h2>
+          </Link>
 
           {/* Spacer to center logo */}
           <div className="w-10" />

@@ -5,7 +5,9 @@ const Dashboard = () => {
   return (
     <Layout>
       <div className="mt-6">
-        <h2 className="text-3xl font-semibold pb-6 text-center">Your Wishlists</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold pb-6 text-center">
+          Your Wishlists
+        </h2>
         <Wishlist />
       </div>
     </Layout>
