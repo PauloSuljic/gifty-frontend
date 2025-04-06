@@ -1,94 +1,151 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiEdit, FiTrash2, FiLock, FiUnlock } from "react-icons/fi";
+import ConfirmReserveModal from "./ui/ConfirmReserveModal"; // ✅ Update this path if needed
 
 type WishlistItemProps = {
-    id: string;
-    name: string;
-    link: string;
-    isReserved: boolean;
-    reservedBy?: string | null;
-    wishlistOwner: string; // ✅ Owner of the wishlist
-    currentUser?: string; // ✅ Currently logged-in user (empty if guest)
-    onToggleReserve: () => void;
-    onDelete?: () => void; // ✅ Optional delete function
-    onEdit?: () => void;
+  id: string;
+  name: string;
+  link: string;
+  isReserved: boolean;
+  reservedBy?: string | null;
+  wishlistOwner: string;
+  currentUser?: string;
+  onToggleReserve: () => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
+};
+
+const WishlistItem = ({
+  name,
+  link,
+  isReserved,
+  reservedBy,
+  wishlistOwner,
+  currentUser,
+  onToggleReserve,
+  onDelete,
+  onEdit,
+}: WishlistItemProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+  const [modalAction, setModalAction] = useState<"reserve" | "unreserve" | null>(null);
+
+  const isGuest = !currentUser;
+  const isOwner = wishlistOwner === currentUser;
+  const isReserver = reservedBy === currentUser;
+
+  const canReserve = !isGuest && !isReserved && !isOwner;
+  const canUnreserve = !isGuest && isReserved && isReserver;
+  const canDelete = isOwner && onDelete;
+
+  // 🔍 Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  const handleConfirmClick = (type: "reserve" | "unreserve") => {
+    setModalAction(type);
   };
-  
-  const WishlistItem = ({
-    name,
-    link,
-    isReserved,
-    reservedBy,
-    wishlistOwner,
-    currentUser,
-    onToggleReserve,
-    onDelete,
-    onEdit
-  }: WishlistItemProps) => {
-    const isGuest = !currentUser; // ✅ Guest users can't reserve/unreserve
-    const isOwner = wishlistOwner === currentUser; // ✅ Is the logged-in user the owner?
-    const isReserver = reservedBy === currentUser; // ✅ Did the current user reserve it?
-  
-    // ✅ Define user actions
-    const canReserve = !isGuest && !isReserved && !isOwner; // ✅ Only non-owners can reserve
-    const canUnreserve = !isGuest && isReserved && isReserver; // ✅ Only the reserver can unreserve
-    const canDelete = isOwner && onDelete; // ✅ Only the wishlist owner can delete
-  
-    return (
-      <div className="p-4 bg-white/10 rounded-lg shadow-lg backdrop-blur-md border border-white/20 flex justify-between items-center">
+
+  return (
+    <>
+      <div className="p-4 bg-white/10 rounded-xl shadow-lg flex justify-between items-start flex-col sm:flex-row sm:items-center gap-3 border border-white/20">
         <div>
-          <h3 className="text-lg font-semibold">{name}</h3>
+          <h3 className="text-base sm:text-lg font-semibold mb-1">{name}</h3>
           {link && (
-            <a href={link} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-sm">
+            <a
+              href={link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-1 text-sm px-3 py-1 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+            >
               View Item
             </a>
           )}
         </div>
-        <div className="flex items-center space-x-2">
-          {/* ✅ Hide Reserve/Unreserve button for owners */}
+
+        <div className="flex items-center space-x-3 sm:space-x-2 sm:mt-0 mt-2">
           {!isOwner && (
             <>
-              {canReserve && (
-                <button
-                  className="px-4 py-2 bg-green-500 rounded-lg transition hover:bg-green-600"
-                  onClick={onToggleReserve}
-                >
-                  Reserve
-                </button>
-              )}
-              {canUnreserve && (
-                <button
-                  className="px-4 py-2 bg-red-500 rounded-lg transition hover:bg-red-600"
-                  onClick={onToggleReserve}
-                >
-                  Unreserve
-                </button>
+              {/* 🔒 Mobile: icons only */}
+              {isMobile ? (
+                <>
+                  {isReserved ? (
+                    <FiLock className="text-gray-400" title="Reserved" />
+                  ) : (
+                    <button
+                      onClick={() => handleConfirmClick("reserve")}
+                      className="text-purple-400 hover:text-purple-500 transition"
+                      title="Reserve Item"
+                    >
+                      <FiUnlock />
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  {canReserve && (
+                    <button
+                      className="bg-purple-500 hover:bg-purple-600 px-3 py-1 text-sm rounded-lg transition"
+                      onClick={() => handleConfirmClick("reserve")}
+                    >
+                      <FiUnlock className="inline mr-1" /> Reserve
+                    </button>
+                  )}
+                  {canUnreserve && (
+                    <button
+                      className="bg-red-500 hover:bg-red-600 px-3 py-1 text-sm rounded-lg transition"
+                      onClick={() => handleConfirmClick("unreserve")}
+                    >
+                      <FiLock className="inline mr-1" /> Unreserve
+                    </button>
+                  )}
+                  {isReserved && !isReserver && (
+                    <span className="flex items-center text-sm text-gray-400">
+                      <FiLock className="mr-1" /> Reserved
+                    </span>
+                  )}
+                </>
               )}
             </>
           )}
-  
-          {/* ✅ Only show delete button for the wishlist owner */}
+
           {canDelete && (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <button
                 onClick={onEdit}
-                className="text-blue-500 hover:text-blue-600 transition"
+                className="text-blue-400 hover:text-blue-500"
                 title="Edit Item"
               >
-                <FiEdit size={20} />
+                <FiEdit size={18} />
               </button>
               <button
                 onClick={onDelete}
-                className="text-red-500 hover:text-red-700 transition"
+                className="text-red-500 hover:text-red-700"
                 title="Delete Item"
               >
-                <FiTrash2 size={20} />
+                <FiTrash2 size={18} />
               </button>
             </div>
           )}
         </div>
       </div>
-    );
-  };
-  
-  export default WishlistItem;
-  
+
+      {/* ✅ Custom Confirm Modal */}
+      <ConfirmReserveModal
+        isOpen={modalAction !== null}
+        onClose={() => setModalAction(null)}
+        onConfirm={() => {
+          setModalAction(null);
+          onToggleReserve();
+        }}
+        itemName={name}
+        actionType={modalAction || "reserve"}
+      />
+    </>
+  );
+};
+
+export default WishlistItem;

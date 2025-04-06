@@ -9,6 +9,19 @@ import ShareLinkModal from "./ui/ShareLinkModal";
 import { apiFetch } from "../api";
 import toast from "react-hot-toast";
 
+import {
+  DndContext,
+  closestCenter,
+  DragEndEvent,
+} from '@dnd-kit/core';
+
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import {SortableItem} from './ui/SortableItem';
+
 // Define TypeScript types
 type WishlistType = {
   id: string;
@@ -44,6 +57,8 @@ const Wishlist = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
 
+  const [wishlistOrder, setWishlistOrder] = useState<string[]>([]);
+
   // 🔽 New state for edit functionality
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<{ id: string; name: string; link: string; wishlistId: string }>({
@@ -56,6 +71,8 @@ const Wishlist = () => {
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
   const [wishlistToRename, setWishlistToRename] = useState<{ id: string; name: string } | null>(null);
   const [newWishlistName, setNewWishlistName] = useState("");
+
+  const [expandedWishlistIds, setExpandedWishlistIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (firebaseUser) fetchWishlists();
@@ -72,9 +89,43 @@ const Wishlist = () => {
     if (response.ok) {
       const data = await response.json();
       setWishlists(data);
+      setWishlistOrder(data.map((w: WishlistType) => w.id)); 
       data.forEach((wishlist: WishlistType) => fetchWishlistItems(wishlist.id));
+
+      // Expand first item in wishlist
+      // if (data.length > 0) {
+      //   setExpandedWishlistIds([data[0].id]);
+      // }
     }
   };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const {active, over} = event;
+    if (!over || active.id === over.id) return;
+  
+    const oldIndex = wishlistOrder.indexOf(active.id as string);
+    const newIndex = wishlistOrder.indexOf(over.id as string);
+  
+    const newOrder = arrayMove(wishlistOrder, oldIndex, newIndex);
+    setWishlistOrder(newOrder);
+  
+    // Update order in backend
+    const reordered = newOrder.map((id, index) => ({
+      id,
+      order: index,
+    }));
+  
+    const token = await firebaseUser?.getIdToken();
+    await apiFetch("/api/wishlists/reorder", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reordered),
+    });
+  };
+  
 
   const createWishlist = async () => {
     if (!firebaseUser) return;
@@ -297,6 +348,15 @@ const Wishlist = () => {
       toast.error("Failed to rename wishlist.");
     }
   };
+
+  const toggleWishlistDropdown = (wishlistId: string) => {
+    setExpandedWishlistIds((prev) =>
+      prev.includes(wishlistId)
+        ? prev.filter((id) => id !== wishlistId)
+        : [...prev, wishlistId]
+    );
+  };
+  
   
   return (
     <div className="max-w-4xl mx-auto text-white px-4"> {/* 👈 Add padding for mobile edge spacing */}
@@ -317,82 +377,117 @@ const Wishlist = () => {
         </button>
       </div>
   
-      {/* Display Wishlists and Items */}
       {wishlists.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {wishlists.map((wishlist) => (
-            <Card key={wishlist.id} className="relative">
-              {/* Wishlist Title & Actions */}
-              <div className="flex justify-between items-center flex-wrap gap-2">
-                <h3 className="text-xl font-semibold break-words">{wishlist.name}</h3>
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <button onClick={() => generateShareLink(wishlist.id)} className="text-blue-500 hover:text-blue-700 transition">
-                    <FiLink size={20} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setWishlistToRename({ id: wishlist.id, name: wishlist.name });
-                      setNewWishlistName(wishlist.name);
-                      setIsRenameModalOpen(true);
-                    }}
-                    className="text-blue-500 hover:text-blue-600 transition"
-                    title="Rename Wishlist"
-                  >
-                    <FiEdit size={20} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
-                      setIsWishlistDeleteModalOpen(true);
-                    }}
-                    className="text-red-500 hover:text-red-700 transition"
-                  >
-                    <FiTrash2 size={20} />
-                  </button>
-                </div>
-              </div>
-  
-              {/* Add Item Button */}
-              <button
-                onClick={() => {
-                  setSelectedWishlist(wishlist.id);
-                  setIsModalOpen(true);
-                }}
-                className="px-4 py-2 mt-4 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
-              >
-                <FiPlus />
-                <span>Add Item</span>
-              </button>
-  
-              {/* Display Wishlist Items */}
-              <div className="mt-4 space-y-3">
-                {wishlistItems[wishlist.id]?.map((item) => (
-                  <WishlistItem
-                    key={item.id}
-                    id={item.id}
-                    name={item.name}
-                    link={item.link}
-                    isReserved={item.isReserved}
-                    reservedBy={item.reservedBy}
-                    wishlistOwner={wishlist.userId}
-                    currentUser={firebaseUser?.uid}
-                    onDelete={() => {
-                      setItemToDelete({
-                        id: item.id,
-                        name: item.name,
-                        wishlistId: wishlist.id,
-                        wishlistName: wishlist.name,
-                      });
-                      setIsDeleteModalOpen(true);
-                    }}
-                    onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                    onEdit={() => openEditModal(item, wishlist.id)}
-                  />
-                ))}
-              </div>
-            </Card>
-          ))}
-        </div>
+        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={wishlistOrder} strategy={verticalListSortingStrategy}>
+            <div className="columns-1 md:columns-2 gap-6 space-y-6 px-4">
+              {wishlistOrder.map((id) => {
+                const wishlist = wishlists.find((w) => w.id === id);
+                if (!wishlist) return null;
+
+                return (
+                  <SortableItem key={wishlist.id} id={wishlist.id}>
+                    <Card className="break-inside-avoid mb-6">
+                      {/* Wishlist Title & Actions */}
+                      <div className="flex justify-between items-center flex-wrap gap-2">
+                        <button
+                          onClick={() => toggleWishlistDropdown(wishlist.id)}
+                          className="flex-1 text-left text-xl font-semibold text-white"
+                        >
+                          {wishlist.name}
+                          <span className="ml-2 text-sm text-gray-400">
+                            {expandedWishlistIds.includes(wishlist.id) ? "▲" : "▼"}
+                          </span>
+                        </button>
+
+                        {/* 🔧 Actions */}
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => generateShareLink(wishlist.id)}
+                            className="text-blue-500 hover:text-blue-700 transition"
+                          >
+                            <FiLink size={20} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setWishlistToRename({ id: wishlist.id, name: wishlist.name });
+                              setNewWishlistName(wishlist.name);
+                              setIsRenameModalOpen(true);
+                            }}
+                            className="text-blue-500 hover:text-blue-600 transition"
+                            title="Rename Wishlist"
+                          >
+                            <FiEdit size={20} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
+                              setIsWishlistDeleteModalOpen(true);
+                            }}
+                            className="text-red-500 hover:text-red-700 transition"
+                          >
+                            <FiTrash2 size={20} />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Add Item Button */}
+                      <button
+                        onClick={() => {
+                          setSelectedWishlist(wishlist.id);
+                          setExpandedWishlistIds((prev) =>
+                            prev.includes(wishlist.id) ? prev : [...prev, wishlist.id]
+                          );
+                          setIsModalOpen(true);
+                        }}
+                        className="px-4 py-2 mt-4 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
+                      >
+                        <FiPlus />
+                        <span>Add Item</span>
+                      </button>
+
+                      {/* Display Wishlist Items */}
+                      <div
+                        className={`
+                          transition-all duration-500 ease-in-out overflow-hidden
+                          ${expandedWishlistIds.includes(wishlist.id)
+                            ? "max-h-[1000px] opacity-100 mt-4"
+                            : "max-h-0 opacity-0 mt-0"}
+                        `}
+                      >
+                        <div className="mt-4 space-y-3">
+                          {wishlistItems[wishlist.id]?.map((item) => (
+                            <WishlistItem
+                              key={item.id}
+                              id={item.id}
+                              name={item.name}
+                              link={item.link}
+                              isReserved={item.isReserved}
+                              reservedBy={item.reservedBy}
+                              wishlistOwner={wishlist.userId}
+                              currentUser={firebaseUser?.uid}
+                              onDelete={() => {
+                                setItemToDelete({
+                                  id: item.id,
+                                  name: item.name,
+                                  wishlistId: wishlist.id,
+                                  wishlistName: wishlist.name,
+                                });
+                                setIsDeleteModalOpen(true);
+                              }}
+                              onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                              onEdit={() => openEditModal(item, wishlist.id)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  </SortableItem>
+                );
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
       ) : (
         <p className="text-gray-300 text-center">No wishlists found. Create one to get started!</p>
       )}

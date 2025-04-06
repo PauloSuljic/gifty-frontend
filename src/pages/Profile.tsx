@@ -98,7 +98,7 @@ const Profile = () => {
           {/* Right: Avatars */}
           <div className="w-full md:w-1/2 flex flex-col items-center">
             <label className="block text-gray-400 mb-3">Select Avatar</label>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-3 gap-3">
               {avatarOptions.map((avatar) => (
                 <img
                   key={avatar}

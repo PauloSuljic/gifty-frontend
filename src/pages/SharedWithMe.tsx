@@ -30,6 +30,7 @@ type GroupedWishlists = {
 const SharedWithMe = () => {
   const { firebaseUser } = useAuth();
   const [sharedWishlists, setSharedWishlists] = useState<GroupedWishlists[]>([]);
+  const [expandedWishlistIds, setExpandedWishlistIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!firebaseUser) return;
@@ -104,6 +105,14 @@ const SharedWithMe = () => {
     }
   };
 
+  const toggleWishlistDropdown = (wishlistId: string) => {
+    setExpandedWishlistIds(prev =>
+      prev.includes(wishlistId)
+        ? prev.filter(id => id !== wishlistId)
+        : [...prev, wishlistId]
+    );
+  };
+
   return (
     <Layout>
       <h2 className="text-2xl sm:text-3xl font-semibold pt-6 text-center">Wishlists Shared With Me</h2>
@@ -124,23 +133,34 @@ const SharedWithMe = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {group.wishlists.map(wishlist => (
                 <Card key={wishlist.id}>
-                  <h4 className="text-xl font-semibold">{wishlist.name}</h4>
-                  <div className="mt-4 space-y-3">
-                    {wishlist.items.map(item => (
-                      <WishlistItem
-                        key={item.id}
-                        id={item.id}
-                        name={item.name}
-                        link={item.link || ""}
-                        isReserved={item.isReserved}
-                        reservedBy={item.reservedBy}
-                        wishlistOwner={group.ownerId}
-                        currentUser={firebaseUser?.uid || ""}
-                        onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                      />
-                    ))}
-                  </div>
-                </Card>
+                  <button
+                    onClick={() => toggleWishlistDropdown(wishlist.id)}
+                    className="w-full flex justify-between items-center text-left text-xl font-semibold text-white"
+                  >
+                    {wishlist.name}
+                    <span className="text-sm text-gray-400">
+                      {expandedWishlistIds.includes(wishlist.id) ? "▲" : "▼"}
+                    </span>
+                  </button>
+                
+                  {expandedWishlistIds.includes(wishlist.id) && (
+                    <div className="mt-4 space-y-3">
+                      {wishlist.items.map(item => (
+                        <WishlistItem
+                          key={item.id}
+                          id={item.id}
+                          name={item.name}
+                          link={item.link || ""}
+                          isReserved={item.isReserved}
+                          reservedBy={item.reservedBy}
+                          wishlistOwner={group.ownerId}
+                          currentUser={firebaseUser?.uid || ""}
+                          onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </Card>              
               ))}
             </div>
           </div>
