@@ -25,9 +25,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
           <Link
             to="/dashboard"
-            className="text-5xl text-purple-400 font-tually border border-purple rounded-2xl px-6 py-2 text-center"
+            className="p-3 m-3 flex items-center justify-center text-center"
           >
-            Gifty
+            <img
+              src="/gifty-logo.png"
+              alt="Gifty"
+              className="h-[65px] w-auto"
+            />
           </Link>
 
           {/* Spacer to center logo */}
@@ -37,12 +41,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {/* ✅ Main Content */}
         <div className="flex-1 flex flex-col lg:pr-6 p-4 pt-4 lg:pt-6">
           <DashboardHeader />
-          <div className="flex-1 overflow-y-auto p-4">{children}</div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {children}
+          </div>
         </div>
 
         {/* ✅ Right Sidebar for Widgets */}
-        <aside className="w-64 hidden lg:block bg-gray-900 p-4 rounded-lg shadow-lg ml-6">
-          <p className="text-gray-400">Coming Soon: Widgets & Insights</p>
+        <aside className="w-64 hidden lg:flex flex-col justify-center items-center bg-gray-900 p-4 rounded-lg shadow-lg ml-6">
+          <p className="text-gray-400 text-center">🎁 Coming Soon: <br /> Friendships & Calendar</p>
         </aside>
       </div>
     </div>

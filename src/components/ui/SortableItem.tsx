@@ -33,9 +33,9 @@ export const SortableItem = ({ id, children }: SortableItemProps) => {
       <div
         {...attributes}
         {...listeners}
-        className="absolute left-2 top-1/2 -translate-y-1/2 cursor-grab z-10"
+        className="absolute top-1/2 -translate-y-1/2 cursor-grab z-10"
       >
-        <FaGripVertical className="text-white opacity-60 hover:opacity-100" />
+        <FaGripVertical className="text-white opacity-60 hover:opacity-100 text-2xl sm:text-2xl" />
       </div>
 
       {/* 🧾 Actual Card Content */}

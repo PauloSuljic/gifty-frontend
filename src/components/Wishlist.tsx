@@ -380,7 +380,7 @@ const Wishlist = () => {
       {wishlists.length > 0 ? (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={wishlistOrder} strategy={verticalListSortingStrategy}>
-            <div className="columns-1 md:columns-2 gap-6 space-y-6 px-4">
+            <div className="columns-1 md:columns-2 gap-6 space-y-6 sm:px-4">
               {wishlistOrder.map((id) => {
                 const wishlist = wishlists.find((w) => w.id === id);
                 if (!wishlist) return null;

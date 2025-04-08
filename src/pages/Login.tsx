@@ -43,9 +43,13 @@ const Login = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white px-4">
       {/* Logo */}
-      <h1 className="text-5xl font-tually text-purple-400 mb-8 text-center border border-purple px-6 py-2 rounded-2xl shadow-md">
-        Gifty
-      </h1>
+      <div className="mb-8 text-center">
+        <img
+          src="/gifty-logo.png"
+          alt="Gifty"
+          className="mx-auto h-[80px] w-auto"
+        />
+      </div>
 
       {/* Login Card */}
       <div className="w-full max-w-md p-8 space-y-6 bg-gray-800 rounded-lg shadow-lg">

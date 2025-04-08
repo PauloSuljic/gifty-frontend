@@ -38,9 +38,16 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </button>
 
         <Link
-            to="/dashboard" className="p-3 m-3 text-5xl text-purple-400 font-tually border border-purple rounded-2xl flex items-center justify-center text-center">
-          Gifty
+          to="/dashboard"
+          className="p-3 m-3 flex items-center justify-center text-center"
+        >
+          <img
+            src="/gifty-logo.png"
+            alt="Gifty"
+            className="h-[65px] w-auto"
+          />
         </Link>
+
         <nav className="mt-10 space-y-4">
           <Link to="/dashboard" className="flex items-center space-x-2 p-3 hover:bg-gray-800 rounded-md">
             <FiHome size={20} /> <span>My Wishlists</span>
