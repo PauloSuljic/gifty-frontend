@@ -47,7 +47,7 @@ const Login = () => {
         <img
           src="/gifty-logo.png"
           alt="Gifty"
-          className="mx-auto h-[80px] w-auto"
+          className="mx-auto h-[65px] w-auto"
         />
       </div>
 

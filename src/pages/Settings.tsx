@@ -56,12 +56,16 @@ const SettingsPage = () => {
             <a
               href="/terms"
               className="block text-blue-400 hover:underline hover:text-blue-300 transition"
+              target="_blank" 
+              rel="noopener noreferrer"
             >
               📄 Terms of Service
             </a>
             <a
               href="/privacy"
               className="block text-blue-400 hover:underline hover:text-blue-300 transition"
+              target="_blank" 
+              rel="noopener noreferrer"
             >
               🔐 Privacy Policy
             </a>

@@ -44,7 +44,7 @@ const Register = () => {
       <img
         src="/gifty-logo.png"
         alt="Gifty"
-        className="mx-auto h-[80px] w-auto"
+        className="mx-auto h-[65px] w-auto"
       />
     </div>
 
@@ -107,11 +107,18 @@ const Register = () => {
             />
             <span className="pt-1">
               &nbsp;I agree to Gifty's{" "}
-              <Link to="/terms" className="text-blue-400 underline hover:text-blue-300">
+              <Link 
+                to="/terms" 
+                className="text-blue-400 underline hover:text-blue-300" 
+                target="_blank" 
+                rel="noopener noreferrer">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link to="/privacy" className="text-blue-400 underline hover:text-blue-300">
+              <Link to="/privacy" 
+                className="text-blue-400 underline hover:text-blue-300" 
+                target="_blank" 
+                rel="noopener noreferrer">
                 Privacy Policy
               </Link>
             </span>
