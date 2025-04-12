@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { FiEdit, FiTrash2, FiLock, FiUnlock } from "react-icons/fi";
-import ConfirmReserveModal from "./ui/ConfirmReserveModal"; // ✅ Update this path if needed
+import { FiEdit, FiTrash2, FiLock, FiUnlock, FiExternalLink } from "react-icons/fi";
+import ConfirmReserveModal from "./ui/ConfirmReserveModal";
 
 type WishlistItemProps = {
   id: string;
@@ -37,7 +37,6 @@ const WishlistItem = ({
   const canUnreserve = !isGuest && isReserved && isReserver;
   const canDelete = isOwner && onDelete;
 
-  // 🔍 Detect mobile screen
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
@@ -51,89 +50,73 @@ const WishlistItem = ({
 
   return (
     <>
-      <div className="p-4 bg-white/10 rounded-xl shadow-lg flex justify-between items-start flex-col sm:flex-row sm:items-center gap-3 border border-white/20">
-        <div>
-          <h3 className="text-base sm:text-lg font-semibold mb-1">{name}</h3>
+      <div className="p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4">
+        <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
+          🎧 {name}
+        </h3>
+
+        <div className="flex flex-wrap gap-3 items-center">
           {link && (
             <a
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block mt-1 text-sm px-3 py-1 rounded-full bg-white/20 text-white hover:bg-white/30 transition"
+              className="flex items-center gap-1 px-3 py-1 text-sm bg-zinc-700 rounded-lg hover:bg-zinc-600 transition"
+              title="View Item"
             >
-              View Item
+              <FiExternalLink />
+              View
             </a>
           )}
-        </div>
 
-        <div className="flex items-center space-x-3 sm:space-x-2 sm:mt-0 mt-2">
           {!isOwner && (
             <>
-              {/* 🔒 Mobile: icons only */}
-              {isMobile ? (
-                <>
-                  {isReserved ? (
-                    <FiLock className="text-gray-400" title="Reserved" />
-                  ) : (
-                    <button
-                      onClick={() => handleConfirmClick("reserve")}
-                      className="text-purple-400 hover:text-purple-500 transition"
-                      title="Reserve Item"
-                    >
-                      <FiUnlock />
-                    </button>
-                  )}
-                </>
-              ) : (
-                <>
-                  {canReserve && (
-                    <button
-                      className="bg-purple-500 hover:bg-purple-600 px-3 py-1 text-sm rounded-lg transition"
-                      onClick={() => handleConfirmClick("reserve")}
-                    >
-                      <FiUnlock className="inline mr-1" /> Reserve
-                    </button>
-                  )}
-                  {canUnreserve && (
-                    <button
-                      className="bg-red-500 hover:bg-red-600 px-3 py-1 text-sm rounded-lg transition"
-                      onClick={() => handleConfirmClick("unreserve")}
-                    >
-                      <FiLock className="inline mr-1" /> Unreserve
-                    </button>
-                  )}
-                  {isReserved && !isReserver && (
-                    <span className="flex items-center text-sm text-gray-400">
-                      <FiLock className="mr-1" /> Reserved
-                    </span>
-                  )}
-                </>
+              {canReserve && (
+                <button
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 rounded-lg transition"
+                  onClick={() => handleConfirmClick("reserve")}
+                >
+                  <FiUnlock /> Reserve
+                </button>
+              )}
+              {canUnreserve && (
+                <button
+                  className="flex items-center gap-1 px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded-lg transition"
+                  onClick={() => handleConfirmClick("unreserve")}
+                >
+                  <FiLock /> Unreserve
+                </button>
+              )}
+              {isReserved && !isReserver && (
+                <span className="flex items-center gap-1 text-sm text-zinc-400">
+                  <FiLock /> Reserved
+                </span>
               )}
             </>
           )}
 
           {canDelete && (
-            <div className="flex items-center space-x-2">
+            <>
               <button
                 onClick={onEdit}
-                className="text-blue-400 hover:text-blue-500"
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg transition"
                 title="Edit Item"
               >
-                <FiEdit size={18} />
+                <FiEdit /> Edit
               </button>
               <button
                 onClick={onDelete}
-                className="text-red-500 hover:text-red-700"
+                className="flex items-center gap-1 px-3 py-1 text-sm bg-red-500 hover:bg-red-600 rounded-lg transition"
                 title="Delete Item"
               >
-                <FiTrash2 size={18} />
+                <FiTrash2 /> Delete
               </button>
-            </div>
+            </>
           )}
         </div>
       </div>
 
-      {/* ✅ Custom Confirm Modal */}
+      {/* Confirmation Modal */}
       <ConfirmReserveModal
         isOpen={modalAction !== null}
         onClose={() => setModalAction(null)}
