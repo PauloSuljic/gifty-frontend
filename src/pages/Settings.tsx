@@ -1,5 +1,5 @@
 import Layout from "../components/layout/Layout";
-import ConfirmDeleteModal from "../components/ui/ConfirmDeleteModal";
+import ConfirmDeleteModal from "../components/ui/modals/ConfirmDeleteModal";
 import { useState } from "react";
 import { useAuth } from "../components/AuthProvider";
 import { apiFetch } from "../api";

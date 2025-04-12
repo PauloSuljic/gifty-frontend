@@ -54,35 +54,50 @@ const SharedWithMe = () => {
   const toggleReservation = async (wishlistId: string, itemId: string) => {
     const token = await firebaseUser?.getIdToken();
     if (!token) return;
-
+  
     try {
       const response = await apiFetch(`/api/wishlist-items/${itemId}/reserve`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (!response.ok) {
-          const errorData = await response.json();
-
-          // ✅ Show a Toast Notification using react-hot-toast
-          if (errorData.error === "You can only reserve 1 item per wishlist.") {
-              toast.error("You can only reserve 1 item per wishlist.", {
-                  duration: 3000, // Closes in 3 seconds
-                  position: "bottom-center",
-                  style: {
-                      background: "#333",  // Dark mode background
-                      color: "#fff",       // White text
-                      border: "1px solid #555", // Optional subtle border
-                  },
-              });
-          }
-          return; // ✅ Stop execution if an error occurs
+        const errorData = await response.json();
+  
+        // ❌ Show error toast for "only one item per wishlist"
+        if (errorData.error === "You can only reserve 1 item per wishlist.") {
+          toast.error("You can only reserve 1 item per wishlist.", {
+            duration: 3000,
+            position: "bottom-center",
+            style: {
+              background: "#333",
+              color: "#fff",
+              border: "1px solid #555",
+            },
+          });
+        }
+        return; // ✅ Stop here if error
       }
-
-
+  
       const updatedItem = await response.json();
-
-      // ✅ Update the state instantly after reservation/unreservation
+  
+      // ✅ Show toast based on action
+      toast.success(
+        updatedItem.isReserved
+          ? "Item reserved successfully! 🎁"
+          : "Reservation removed ✅",
+        {
+          duration: 3000,
+          position: "bottom-center",
+          style: {
+            background: "#333",
+            color: "#fff",
+            border: "1px solid #555",
+          },
+        }
+      );
+  
+      // ✅ Update UI immediately
       setSharedWishlists((prev) =>
         prev.map((group) => ({
           ...group,
@@ -92,7 +107,11 @@ const SharedWithMe = () => {
                   ...w,
                   items: w.items.map((i) =>
                     i.id === itemId
-                      ? { ...i, isReserved: updatedItem.isReserved, reservedBy: updatedItem.reservedBy }
+                      ? {
+                          ...i,
+                          isReserved: updatedItem.isReserved,
+                          reservedBy: updatedItem.reservedBy,
+                        }
                       : i
                   ),
                 }
@@ -102,8 +121,12 @@ const SharedWithMe = () => {
       );
     } catch (error) {
       console.error("Error toggling reservation:", error);
+      toast.error("Something went wrong!", {
+        duration: 3000,
+        position: "bottom-center",
+      });
     }
-  };
+  };  
 
   const toggleWishlistDropdown = (wishlistId: string) => {
     setExpandedWishlistIds(prev =>

@@ -4,8 +4,8 @@ import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Modal from "./ui/Modal";
 import { FiTrash2, FiLink, FiPlus, FiEdit } from "react-icons/fi";
-import ConfirmDeleteModal from "./ui/ConfirmDeleteModal";
-import ShareLinkModal from "./ui/ShareLinkModal";
+import ConfirmDeleteModal from "./ui/modals/ConfirmDeleteModal";
+import ShareLinkModal from "./ui/modals/ShareLinkModal";
 import { apiFetch } from "../api";
 import toast from "react-hot-toast";
 
@@ -126,48 +126,60 @@ const Wishlist = () => {
     });
   };
   
-
   const createWishlist = async () => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
+  
     const response = await apiFetch("/api/wishlists", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        userId: firebaseUser.uid, 
-        name: newWishlist, 
-        isPublic: false 
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        userId: firebaseUser.uid,
+        name: newWishlist,
+        isPublic: false
       }),
     });
-
+  
     if (response.ok) {
+      toast.success("Wishlist created! 🎉", {
+        duration: 3000,
+        position: "bottom-center",
+      });
       fetchWishlists();
       setNewWishlist("");
+    } else {
+      toast.error("Failed to create wishlist 😞");
     }
-  };
+  };  
 
   const deleteWishlist = async () => {
-    if (!firebaseUser || !wishlistToDelete) return; // ✅ Ensure we have the wishlist info
-  
+    if (!firebaseUser || !wishlistToDelete) return;
     const token = await firebaseUser.getIdToken();
-    
+  
     const response = await apiFetch(`/api/wishlists/${wishlistToDelete.id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
   
     if (response.ok) {
-      setWishlists((prev) => prev.filter((wishlist) => wishlist.id !== wishlistToDelete.id));
+      setWishlists((prev) => prev.filter((w) => w.id !== wishlistToDelete.id));
       setWishlistItems((prev) => {
-        const updatedItems = { ...prev };
-        delete updatedItems[wishlistToDelete.id]; 
-        return updatedItems;
+        const updated = { ...prev };
+        delete updated[wishlistToDelete.id];
+        return updated;
       });
   
-      setIsWishlistDeleteModalOpen(false); // ✅ Close modal after deletion
-      setWishlistToDelete(null); // ✅ Reset selection
+      setIsWishlistDeleteModalOpen(false);
+      setWishlistToDelete(null);
+      toast.success(`Wishlist "${wishlistToDelete.name}" deleted 🗑️`, {
+        duration: 3000,
+        position: "bottom-center",
+      });
     } else {
-      console.error("Error deleting wishlist:", await response.json());
+      toast.error("Failed to delete wishlist.");
     }
   };  
 
@@ -193,13 +205,16 @@ const Wishlist = () => {
       });
       return;
     }
-
+  
     if (!selectedWishlist) return;
-
+  
     const token = await firebaseUser?.getIdToken();
     const response = await apiFetch("/api/wishlist-items", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         name: newItem.name,
         link: newItem.link,
@@ -207,7 +222,7 @@ const Wishlist = () => {
         reservedBy: null
       }),
     });
-
+  
     if (response.ok) {
       const createdItem = await response.json();
       setWishlistItems((prev) => ({
@@ -215,30 +230,48 @@ const Wishlist = () => {
         [selectedWishlist]: [...(prev[selectedWishlist] || []), createdItem],
       }));
       setNewItem({ name: "", link: "" });
-      setIsModalOpen(false); // ✅ Close modal after adding
+      setIsModalOpen(false);
+  
+      toast.success("Item added to wishlist! 🎁", {
+        duration: 3000,
+        position: "bottom-center"
+      });
     } else {
       console.error("Error adding item:", await response.json());
+      toast.error("Failed to add item. 😞", {
+        duration: 3000,
+        position: "bottom-center"
+      });
     }
-  };
+  };  
 
   const deleteWishlistItem = async () => {
     if (!firebaseUser || !itemToDelete) return;
-    const { id, wishlistId } = itemToDelete;
+    const { id, wishlistId, name } = itemToDelete;
     const token = await firebaseUser.getIdToken();
-
+  
     const response = await apiFetch(`/api/wishlist-items/${id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
     });
-
+  
     if (response.ok) {
       setWishlistItems((prev) => ({
         ...prev,
         [wishlistId]: prev[wishlistId].filter((item) => item.id !== id),
       }));
-      setIsDeleteModalOpen(false); // ✅ Close modal after deleting
+      setIsDeleteModalOpen(false);
+      toast.success(`Deleted "${name}" from wishlist 🗑️`, {
+        duration: 3000,
+        position: "bottom-center",
+      });
+    } else {
+      toast.error("Failed to delete item.");
     }
-  };
+  };  
 
   const toggleReservation = async (wishlistId: string, itemId: string) => {
     if (!firebaseUser) return;

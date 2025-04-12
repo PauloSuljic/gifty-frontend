@@ -33,7 +33,7 @@ const ShareLinkModal = ({ isOpen, onClose, shareUrl }: ShareLinkModalProps) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50" onClick={handleClickOutside}>
-      <div ref={modalRef} className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-xl relative">
+      <div ref={modalRef} className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md mx-4 relative">
         <h2 className="text-xl font-semibold text-white">Share Wishlist</h2>
         <p className="text-gray-300 mt-2">Share this link with others:</p>
         

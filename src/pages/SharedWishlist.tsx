@@ -22,7 +22,7 @@ type WishlistType = {
   items: WishlistItemType[];
   ownerId: string;
   ownerName: string;
-  ownerAvatarUrl: string;
+  ownerAvatar: string;
 };
 
 const SharedWishlist = () => {
@@ -116,7 +116,7 @@ const SharedWishlist = () => {
         {/* Header: Sharer Info */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6">
           <img
-            src={wishlist.ownerAvatarUrl || "/avatars/avatar1.png"}
+            src={wishlist.ownerAvatar || "/avatars/avatar1.png"}
             alt="Sharer Avatar"
             className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border border-white/20"
           />

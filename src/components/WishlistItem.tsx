@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiLock, FiUnlock, FiExternalLink } from "react-icons/fi";
-import ConfirmReserveModal from "./ui/ConfirmReserveModal";
+import ConfirmReserveModal from "./ui/modals/ConfirmReserveModal";
 
 type WishlistItemProps = {
   id: string;

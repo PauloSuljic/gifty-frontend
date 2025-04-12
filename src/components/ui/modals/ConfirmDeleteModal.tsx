@@ -22,7 +22,7 @@ const ConfirmDeleteModal = ({ isOpen, onClose, onConfirm, itemName, wishlistName
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50" onClick={handleClickOutside}>
-      <div ref={modalRef} className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md relative">
+      <div ref={modalRef} className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md mx-4 relative">
         <h2 className="text-xl font-semibold text-white">Confirm Deletion</h2>
         
         {/* ✅ Conditional Text */}
