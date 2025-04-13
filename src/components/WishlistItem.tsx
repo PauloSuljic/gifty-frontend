@@ -66,7 +66,7 @@ const WishlistItem = ({
         </h3>
 
         <div
-          className={`flex flex-wrap justify-center items-center gap-3 transition-all ${
+          className={`flex justify-center items-center gap-3 transition-all ${
             isMobile && !showActions ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto mt-2"
           }`}
         >

@@ -63,6 +63,8 @@ const Wishlist = () => {
 
   const [wishlistOrder, setWishlistOrder] = useState<string[]>([]);
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // 🔽 New state for edit functionality
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<{ id: string; name: string; link: string; wishlistId: string }>({
@@ -484,20 +486,12 @@ const Wishlist = () => {
   return (
     <div className="max-w-4xl mx-auto text-white px-4">
       {/* Create New Wishlist */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <input
-          value={newWishlist}
-          onChange={(e) => setNewWishlist(e.target.value)}
-          placeholder="New Wishlist Name"
-          maxLength={30}
-          className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
-        />
+      <div className="flex justify-center mb-6">
         <button
-          onClick={createWishlist}
-          className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition shadow-lg w-full sm:w-auto"
-          disabled={!newWishlist.trim()}
+          onClick={() => setIsCreateModalOpen(true)}
+          className="px-6 py-1.5 rounded-md bg-purple-500 hover:bg-purple-600 transition shadow-md"
         >
-          Create
+          Create Wishlist
         </button>
       </div>
   
@@ -772,6 +766,29 @@ const Wishlist = () => {
         onClose={() => setIsShareModalOpen(false)} 
         shareUrl={shareUrl}
       />
+
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
+        <h2 className="text-xl font-bold mb-4">New Wishlist</h2>
+        <input
+          type="text"
+          value={newWishlist}
+          onChange={(e) => setNewWishlist(e.target.value)}
+          placeholder="Wishlist Name"
+          maxLength={30}
+          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4"
+        />
+        <button
+          onClick={() => {
+            createWishlist();
+            setIsCreateModalOpen(false);
+          }}
+          className="px-4 py-2 bg-purple-500 rounded-lg w-full"
+          disabled={!newWishlist.trim()}
+        >
+          Create
+        </button>
+      </Modal>
+
     </div>
   );
 };
