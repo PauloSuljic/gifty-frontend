@@ -28,7 +28,7 @@ const ConfirmReserveModal = ({ isOpen, onClose, onConfirm, itemName, actionType 
     >
       <div
         ref={modalRef}
-        className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md"
+        className="bg-gray-800 p-6 rounded-lg shadow-lg w-full mx-4 max-w-md"
       >
         <h2 className="text-xl font-semibold text-white">
           {isReserving ? "Confirm Reservation" : "Confirm Unreserve"}

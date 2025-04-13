@@ -1,6 +1,5 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FaGripVertical } from "react-icons/fa";
 
 type SortableItemProps = {
   id: string;
@@ -21,25 +20,20 @@ export const SortableItem = ({ id, children }: SortableItemProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    touchAction: "none",              // ✅ Prevent zooming/panning while dragging
+    cursor: isDragging ? "grabbing" : "grab" // ✅ Visual feedback
   };
 
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="relative"
+      className="relative select-none" // ✅ Prevent text selection during drag
+      {...attributes}
+      {...listeners}
     >
-      {/* 🔧 Drag Handle Icon */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-1/2 -translate-y-1/2 cursor-grab z-10"
-      >
-        <FaGripVertical className="text-white opacity-60 hover:opacity-100 text-2xl sm:text-2xl" />
-      </div>
 
-      {/* 🧾 Actual Card Content */}
-      <div className="pl-8">
+      <div>
         {children}
       </div>
     </div>

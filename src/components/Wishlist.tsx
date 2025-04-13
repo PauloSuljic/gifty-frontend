@@ -13,6 +13,9 @@ import {
   DndContext,
   closestCenter,
   DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
 
 import {
@@ -389,21 +392,29 @@ const Wishlist = () => {
         : [...prev, wishlistId]
     );
   };
+
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      delay: 300, // ⏳ Wait 300ms before drag starts
+      tolerance: 5, // 📱 Allow minor movement before canceling
+    },
+  });
   
+  const sensors = useSensors(pointerSensor);  
   
   return (
-    <div className="max-w-4xl mx-auto text-white px-4"> {/* 👈 Add padding for mobile edge spacing */}
+    <div className="max-w-4xl mx-auto text-white px-4 overflow-x-hidden overflow-y-auto">
       {/* Create New Wishlist */}
-      <div className="flex flex-wrap gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
           value={newWishlist}
           onChange={(e) => setNewWishlist(e.target.value)}
           placeholder="New Wishlist Name"
-          className="flex-grow min-w-[200px] px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
+          className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
         />
         <button
           onClick={createWishlist}
-          className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition shadow-lg"
+          className="px-6 py-2 rounded-lg bg-purple-500 hover:bg-purple-600 transition shadow-lg w-full sm:w-auto"
           disabled={!newWishlist.trim()}
         >
           Create
@@ -411,9 +422,13 @@ const Wishlist = () => {
       </div>
   
       {wishlists.length > 0 ? (
-        <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >      
           <SortableContext items={wishlistOrder} strategy={verticalListSortingStrategy}>
-            <div className="columns-1 md:columns-2 gap-6 space-y-6 sm:px-4">
+          <div className="columns-1 md:columns-2 gap-6 space-y-6 sm:px-4 overflow-x-hidden">
               {wishlistOrder.map((id) => {
                 const wishlist = wishlists.find((w) => w.id === id);
                 if (!wishlist) return null;
