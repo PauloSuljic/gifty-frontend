@@ -13,29 +13,24 @@ export const SortableItem = ({ id, children }: SortableItemProps) => {
     setNodeRef,
     transform,
     transition,
-    isDragging,
+    isDragging
   } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-    touchAction: "none",              // ✅ Prevent zooming/panning while dragging
-    cursor: isDragging ? "grabbing" : "grab" // ✅ Visual feedback
-  };
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className="relative select-none" // ✅ Prevent text selection during drag
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        cursor: isDragging ? "grabbing" : "grab",
+        // ❌ Don't set touchAction: 'none' here!
+      }}
+      className="relative select-none"
       {...attributes}
       {...listeners}
     >
-
-      <div>
-        {children}
-      </div>
+      {children}
     </div>
   );
 };

@@ -3,11 +3,12 @@ import { useAuth } from "../components/AuthProvider";
 import Card from "./ui/Card";
 import WishlistItem from "./WishlistItem";
 import Modal from "./ui/Modal";
-import { FiTrash2, FiLink, FiPlus, FiEdit } from "react-icons/fi";
+import { FiTrash2, FiLink, FiPlus, FiEdit, FiMoreVertical } from "react-icons/fi";
 import ConfirmDeleteModal from "./ui/modals/ConfirmDeleteModal";
 import ShareLinkModal from "./ui/modals/ShareLinkModal";
 import { apiFetch } from "../api";
 import toast from "react-hot-toast";
+import { Menu } from "@headlessui/react";
 
 import {
   DndContext,
@@ -481,7 +482,7 @@ const Wishlist = () => {
   const sensors = useSensors(pointerSensor);  
   
   return (
-    <div className="max-w-4xl mx-auto text-white px-4 overflow-x-hidden overflow-y-auto">
+    <div className="max-w-4xl mx-auto text-white px-4">
       {/* Create New Wishlist */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <input
@@ -507,7 +508,7 @@ const Wishlist = () => {
           onDragEnd={handleDragEnd}
         >      
           <SortableContext items={wishlistOrder} strategy={verticalListSortingStrategy}>
-          <div className="columns-1 md:columns-2 gap-6 space-y-6 sm:px-4 overflow-x-hidden">
+          <div className="columns-1 md:columns-2 gap-6 space-y-6 sm:px-4 overflow-x-visible">
               {wishlistOrder.map((id) => {
                 const wishlist = wishlists.find((w) => w.id === id);
                 if (!wishlist) return null;
@@ -527,34 +528,61 @@ const Wishlist = () => {
                           </span>
                         </button>
 
-                        {/* 🔧 Actions */}
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => generateShareLink(wishlist.id)}
-                            className="text-blue-500 hover:text-blue-700 transition"
-                          >
-                            <FiLink size={20} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setWishlistToRename({ id: wishlist.id, name: wishlist.name });
-                              setNewWishlistName(wishlist.name);
-                              setIsRenameModalOpen(true);
-                            }}
-                            className="text-blue-500 hover:text-blue-600 transition"
-                            title="Rename Wishlist"
-                          >
-                            <FiEdit size={20} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
-                              setIsWishlistDeleteModalOpen(true);
-                            }}
-                            className="text-red-500 hover:text-red-700 transition"
-                          >
-                            <FiTrash2 size={20} />
-                          </button>
+                        {/* 🔧 Dropdown Menu */}
+                        <div className="relative">
+                          <Menu as="div" className="relative inline-block text-left z-20">
+                            <Menu.Button className="p-2 text-white hover:text-purple-400 transition">
+                              <FiMoreVertical size={20} />
+                            </Menu.Button>
+
+                            <Menu.Items className="absolute right-0 mt-2 w-40 origin-top-right divide-y divide-gray-700 rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                              <div className="py-1">
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <button
+                                      onClick={() => generateShareLink(wishlist.id)}
+                                      className={`${
+                                        active ? "bg-gray-700" : ""
+                                      } flex items-center w-full px-4 py-2 text-sm text-white gap-2`}
+                                    >
+                                      <FiLink /> Share
+                                    </button>
+                                  )}
+                                </Menu.Item>
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <button
+                                      onClick={() => {
+                                        setWishlistToRename({ id: wishlist.id, name: wishlist.name });
+                                        setNewWishlistName(wishlist.name);
+                                        setIsRenameModalOpen(true);
+                                      }}
+                                      className={`${
+                                        active ? "bg-gray-700" : ""
+                                      } flex items-center w-full px-4 py-2 text-sm text-white gap-2`}
+                                    >
+                                      <FiEdit /> Rename
+                                    </button>
+                                  )}
+                                </Menu.Item>
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <button
+                                      onClick={() => {
+                                        setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
+                                        setIsWishlistDeleteModalOpen(true);
+                                      }}
+                                      className={`${
+                                        active ? "bg-red-700" : ""
+                                      } flex items-center w-full px-4 py-2 text-sm text-red-400 gap-2`}
+                                    >
+                                      <FiTrash2 /> Delete
+                                    </button>
+                                  )}
+                                </Menu.Item>
+                              </div>
+                            </Menu.Items>
+                          </Menu>
                         </div>
                       </div>
 
@@ -567,7 +595,7 @@ const Wishlist = () => {
                           );
                           setIsModalOpen(true);
                         }}
-                        className="px-4 py-2 mt-4 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
+                        className="px-4 py-2 mt-4 h-8 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
                       >
                         <FiPlus />
                         <span>Add Item</span>

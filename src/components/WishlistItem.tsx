@@ -28,6 +28,7 @@ const WishlistItem = ({
 }: WishlistItemProps) => {
   const [isMobile, setIsMobile] = useState(false);
   const [modalAction, setModalAction] = useState<"reserve" | "unreserve" | null>(null);
+  const [showActions, setShowActions] = useState(false);
 
   const isGuest = !currentUser;
   const isOwner = wishlistOwner === currentUser;
@@ -48,68 +49,77 @@ const WishlistItem = ({
     setModalAction(type);
   };
 
+  const baseBtn =
+    "w-[80px] h-7 flex items-center justify-center gap-1 text-sm rounded-md transition";
+
+  const purpleBtn =
+    "border border-purple-500 text-purple-400 hover:bg-purple-600 hover:text-white";
+
   return (
     <>
-      <div className="p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2 mb-2">
-          🎧 {name}
+      <div
+        className="p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4"
+        onClick={() => isMobile && setShowActions((prev) => !prev)}
+      >
+        <h3 className={`font-semibold flex items-center gap-2 mb-2 ${isMobile ? "text-base" : "text-lg"}`}>
+          {name}
         </h3>
 
-        <div className="flex flex-wrap gap-3 items-center">
+        <div
+          className={`flex flex-wrap justify-center items-center gap-3 transition-all ${
+            isMobile && !showActions ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto mt-2"
+          }`}
+        >
           {link && (
             <a
               href={link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 px-3 py-1 text-sm bg-zinc-700 rounded-lg hover:bg-zinc-600 transition"
+              className={`${baseBtn} ${purpleBtn}`}
               title="View Item"
             >
               <FiExternalLink />
-              View
+              {!isMobile && "View"}
             </a>
           )}
 
-          {!isOwner && (
-            <>
-              {canReserve && (
-                <button
-                  className="flex items-center gap-1 px-3 py-1 text-sm bg-purple-600 hover:bg-purple-700 rounded-lg transition"
-                  onClick={() => handleConfirmClick("reserve")}
-                >
-                  <FiUnlock /> Reserve
-                </button>
-              )}
-              {canUnreserve && (
-                <button
-                  className="flex items-center gap-1 px-3 py-1 text-sm bg-red-600 hover:bg-red-700 rounded-lg transition"
-                  onClick={() => handleConfirmClick("unreserve")}
-                >
-                  <FiLock /> Unreserve
-                </button>
-              )}
-              {isReserved && !isReserver && (
-                <span className="flex items-center gap-1 text-sm text-zinc-400">
-                  <FiLock /> Reserved
-                </span>
-              )}
-            </>
+          {canReserve && (
+            <button
+              onClick={() => handleConfirmClick("reserve")}
+              className={`${baseBtn} ${purpleBtn}`}
+            >
+              <FiUnlock />
+              {!isMobile && "Reserve"}
+            </button>
+          )}
+
+          {canUnreserve && (
+            <button
+              onClick={() => handleConfirmClick("unreserve")}
+              className={`${baseBtn} ${purpleBtn}`}
+            >
+              <FiLock />
+              {!isMobile && "Unreserve"}
+            </button>
           )}
 
           {canDelete && (
             <>
               <button
                 onClick={onEdit}
-                className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 rounded-lg transition"
+                className={`${baseBtn} ${purpleBtn}`}
                 title="Edit Item"
               >
-                <FiEdit /> Edit
+                <FiEdit />
+                {!isMobile && "Edit"}
               </button>
               <button
                 onClick={onDelete}
-                className="flex items-center gap-1 px-3 py-1 text-sm bg-red-500 hover:bg-red-600 rounded-lg transition"
+                className={`${baseBtn} bg-red-600 hover:bg-red-700 text-white`}
                 title="Delete Item"
               >
-                <FiTrash2 /> Delete
+                <FiTrash2 />
+                {!isMobile && "Delete"}
               </button>
             </>
           )}
