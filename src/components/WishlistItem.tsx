@@ -50,7 +50,8 @@ const WishlistItem = ({
   };
 
   const baseBtn =
-    "w-[70px] h-7 flex items-center justify-center gap-1 text-sm rounded-md transition";
+  "h-7 w-[60px] sm:w-[80px] flex items-center justify-center gap-1 text-sm rounded-md transition";
+
 
   const purpleBtn =
     "border border-purple-500 text-purple-400 hover:bg-purple-600 hover:text-white";
@@ -66,7 +67,7 @@ const WishlistItem = ({
         </h3>
 
         <div
-          className={`flex flex-wrap justify-center items-center gap-x-3 transition-all ${
+          className={`flex flex-wrap justify-center items-center gap-3 transition-all ${
             isMobile && !showActions ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto mt-2"
           }`}
         >
