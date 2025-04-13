@@ -77,6 +77,10 @@ const Wishlist = () => {
 
   const [expandedWishlistIds, setExpandedWishlistIds] = useState<string[]>([]);
 
+  const [errors, setErrors] = useState<{ name?: string; link?: string }>({});
+
+  const [renameError, setRenameError] = useState<string | null>(null);
+
   useEffect(() => {
     if (firebaseUser) fetchWishlists();
   }, [firebaseUser]);
@@ -132,6 +136,15 @@ const Wishlist = () => {
   const createWishlist = async () => {
     if (!firebaseUser) return;
     const token = await firebaseUser.getIdToken();
+
+    if (!newWishlist.trim()) {
+      toast.error("Wishlist name cannot be empty.");
+      return;
+    }
+    if (newWishlist.length > 30) {
+      toast.error("Wishlist name must be under 30 characters.");
+      return;
+    }    
   
     const response = await apiFetch("/api/wishlists", {
       method: "POST",
@@ -201,17 +214,43 @@ const Wishlist = () => {
   };
 
   const addWishlistItem = async () => {
-    if (!newItem.name.trim() || !newItem.link.trim()) {
-      toast.error("Please enter both item name and link.", {
-        duration: 3000,
-        position: "bottom-center"
-      });
+    const newErrors: typeof errors = {};
+  
+    // Validate item name
+    if (!newItem.name.trim()) {
+      newErrors.name = "Item name is required.";
+    } else if (newItem.name.length > 30) {
+      newErrors.name = "Item name must be under 30 characters.";
+    }
+  
+    // Validate link
+    const isValidUrl = (str: string) => {
+      try {
+        new URL(str);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+  
+    if (!newItem.link.trim()) {
+      newErrors.link = "Link is required.";
+    } else if (!isValidUrl(newItem.link)) {
+      newErrors.link = "Enter a valid URL (e.g., https://example.com)";
+    }
+  
+    // If validation fails, show errors and exit
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
   
-    if (!selectedWishlist) return;
+    // ✅ Clear errors if all good
+    setErrors({});
   
-    const token = await firebaseUser?.getIdToken();
+    if (!selectedWishlist || !firebaseUser) return;
+  
+    const token = await firebaseUser.getIdToken();
     const response = await apiFetch("/api/wishlist-items", {
       method: "POST",
       headers: {
@@ -232,6 +271,7 @@ const Wishlist = () => {
         ...prev,
         [selectedWishlist]: [...(prev[selectedWishlist] || []), createdItem],
       }));
+  
       setNewItem({ name: "", link: "" });
       setIsModalOpen(false);
   
@@ -321,9 +361,38 @@ const Wishlist = () => {
 
   // 🔽 Function to update wishlist item
   const updateWishlistItem = async () => {
+    const newErrors: typeof errors = {};
+  
+    if (!itemToEdit.name.trim()) {
+      newErrors.name = "Item name is required.";
+    } else if (itemToEdit.name.length > 30) {
+      newErrors.name = "Name must be under 30 characters.";
+    }
+  
+    const isValidUrl = (str: string) => {
+      try {
+        new URL(str);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+  
+    if (!itemToEdit.link.trim()) {
+      newErrors.link = "Link is required.";
+    } else if (!isValidUrl(itemToEdit.link)) {
+      newErrors.link = "Enter a valid URL (e.g., https://example.com)";
+    }
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+  
+    setErrors({});
     const token = await firebaseUser?.getIdToken();
     if (!token) return;
-
+  
     const response = await apiFetch(`/api/wishlist-items/${itemToEdit.id}`, {
       method: "PATCH",
       headers: {
@@ -335,7 +404,7 @@ const Wishlist = () => {
         link: itemToEdit.link
       })
     });
-
+  
     if (response.ok) {
       const updated = await response.json();
       setWishlistItems((prev) => ({
@@ -351,23 +420,31 @@ const Wishlist = () => {
         icon: "✅",
       });
     } else {
-      console.error("Failed to update item:", await response.json());
       toast.error("Something went wrong!", {
         position: "bottom-center",
         duration: 3000,
         icon: "❌",
       });
     }
-  };
+  };  
 
   const renameWishlist = async () => {
-    if (!firebaseUser || !wishlistToRename || !newWishlistName.trim()) return;
+    if (!firebaseUser || !wishlistToRename) return;
+  
+    if (!newWishlistName.trim()) {
+      setRenameError("Name is required.");
+      return;
+    }
+    if (newWishlistName.length > 30) {
+      setRenameError("Name must be under 30 characters.");
+      return;
+    }
   
     const token = await firebaseUser.getIdToken();
   
     const response = await apiFetch(`/api/wishlists/${wishlistToRename.id}`, {
       method: "PATCH",
-      headers: { 
+      headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json"
       },
@@ -376,14 +453,15 @@ const Wishlist = () => {
   
     if (response.ok) {
       toast.success("Wishlist renamed!");
-      fetchWishlists(); // refresh
+      fetchWishlists();
       setIsRenameModalOpen(false);
       setWishlistToRename(null);
       setNewWishlistName("");
+      setRenameError(null);
     } else {
       toast.error("Failed to rename wishlist.");
     }
-  };
+  };  
 
   const toggleWishlistDropdown = (wishlistId: string) => {
     setExpandedWishlistIds((prev) =>
@@ -410,6 +488,7 @@ const Wishlist = () => {
           value={newWishlist}
           onChange={(e) => setNewWishlist(e.target.value)}
           placeholder="New Wishlist Name"
+          maxLength={30}
           className="w-full sm:flex-1 px-4 py-2 rounded-lg bg-white/20 backdrop-blur-md text-white placeholder-gray-300 outline-none"
         />
         <button
@@ -543,10 +622,47 @@ const Wishlist = () => {
       {/* Modal for Adding Items */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <h2 className="text-xl font-bold mb-4">Add Item</h2>
-        <input type="text" placeholder="Item Name" value={newItem.name} onChange={(e) => setNewItem({ ...newItem, name: e.target.value })} className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-2" />
-        <input type="text" placeholder="Item Link" value={newItem.link} onChange={(e) => setNewItem({ ...newItem, link: e.target.value })} className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4" />
-        <button onClick={addWishlistItem} className="px-4 py-2 bg-purple-500 rounded-lg w-full">Confirm</button>
-      </Modal>
+
+        <input
+          type="text"
+          placeholder="Item Name"
+          value={newItem.name}
+          onChange={(e) => {
+            setNewItem({ ...newItem, name: e.target.value });
+            setErrors((prev) => ({ ...prev, name: undefined }));
+          }}
+          maxLength={30}
+          className={`w-full px-4 py-2 rounded bg-gray-700 text-white mb-2 border ${
+            errors.name ? "border-red-500" : "border-transparent"
+          }`}
+        />
+        {errors.name && (
+          <p className="text-red-400 text-sm mb-2">{errors.name}</p>
+        )}
+
+        <input
+          type="text"
+          placeholder="Item Link"
+          value={newItem.link}
+          onChange={(e) => {
+            setNewItem({ ...newItem, link: e.target.value });
+            setErrors((prev) => ({ ...prev, link: undefined }));
+          }}
+          className={`w-full px-4 py-2 rounded bg-gray-700 text-white mb-2 border ${
+            errors.link ? "border-red-500" : "border-transparent"
+          }`}
+        />
+        {errors.link && (
+          <p className="text-red-400 text-sm mb-2">{errors.link}</p>
+        )}
+
+        <button
+          onClick={addWishlistItem}
+          className="px-4 py-2 bg-purple-500 rounded-lg w-full"
+        >
+          Confirm
+        </button>
+      </Modal>    
 
       {/* ✅ Modal for Editing Items */}
       <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
@@ -555,20 +671,35 @@ const Wishlist = () => {
           type="text"
           placeholder="Item Name"
           value={itemToEdit.name}
-          onChange={(e) => setItemToEdit({ ...itemToEdit, name: e.target.value })}
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-2"
+          onChange={(e) => {
+            setItemToEdit({ ...itemToEdit, name: e.target.value });
+            setErrors((prev) => ({ ...prev, name: undefined }));
+          }}
+          maxLength={30}
+          className={`w-full px-4 py-2 rounded bg-gray-700 text-white mb-2 border ${
+            errors.name ? "border-red-500" : "border-transparent"
+          }`}
         />
+        {errors.name && <p className="text-red-400 text-sm mb-2">{errors.name}</p>}
+
         <input
           type="text"
           placeholder="Item Link"
           value={itemToEdit.link}
-          onChange={(e) => setItemToEdit({ ...itemToEdit, link: e.target.value })}
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4"
+          onChange={(e) => {
+            setItemToEdit({ ...itemToEdit, link: e.target.value });
+            setErrors((prev) => ({ ...prev, link: undefined }));
+          }}
+          className={`w-full px-4 py-2 rounded bg-gray-700 text-white mb-2 border ${
+            errors.link ? "border-red-500" : "border-transparent"
+          }`}
         />
+        {errors.link && <p className="text-red-400 text-sm mb-2">{errors.link}</p>}
+
         <button onClick={updateWishlistItem} className="px-4 py-2 bg-purple-500 rounded-lg w-full">
           Save Changes
         </button>
-      </Modal>
+      </Modal>      
 
       <Modal isOpen={isRenameModalOpen} onClose={() => setIsRenameModalOpen(false)}>
         <h2 className="text-xl font-bold mb-4">Rename Wishlist</h2>
@@ -576,13 +707,20 @@ const Wishlist = () => {
           type="text"
           placeholder="New wishlist name"
           value={newWishlistName}
-          onChange={(e) => setNewWishlistName(e.target.value)}
-          className="w-full px-4 py-2 rounded bg-gray-700 text-white mb-4"
+          onChange={(e) => {
+            setNewWishlistName(e.target.value);
+            setRenameError(null);
+          }}
+          maxLength={30}
+          className={`w-full px-4 py-2 rounded bg-gray-700 text-white mb-2 border ${
+            renameError ? "border-red-500" : "border-transparent"
+          }`}
         />
+        {renameError && <p className="text-red-400 text-sm mb-2">{renameError}</p>}
         <button onClick={renameWishlist} className="px-4 py-2 bg-purple-500 rounded-lg w-full">
           Save Changes
         </button>
-      </Modal>
+      </Modal>  
 
       {/* ✅ Delete Confirmation Modal */}
       <ConfirmDeleteModal
