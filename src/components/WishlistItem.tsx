@@ -50,7 +50,7 @@ const WishlistItem = ({
   };
 
   const baseBtn =
-  "h-7 w-[60px] sm:w-[80px] flex items-center justify-center gap-1 text-sm rounded-md transition";
+  "h-7 w-[50px] sm:w-[80px] flex items-center justify-center gap-1 text-sm rounded-md transition";
 
 
   const purpleBtn =
