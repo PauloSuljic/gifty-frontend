@@ -28,7 +28,7 @@ const WishlistItem = ({
   onDelete,
   onEdit,
 }: WishlistItemProps) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [, setIsMobile] = useState(false);
   const [modalAction, setModalAction] = useState<"reserve" | "unreserve" | null>(null);
   const [showActions, setShowActions] = useState(false);
 

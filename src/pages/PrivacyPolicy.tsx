@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 
 const PrivacyPolicy = () => {
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+    <div className="h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
       {/* Mobile Top Row: Logo only, like in Layout */}
       <div className="flex justify-center items-center w-full mb-6">
         <Link
           to="/dashboard"
-          className="p-3 flex items-center justify-center text-center"
+          className="p-3 m-3 flex items-center justify-center text-center"
         >
           <img
             src="/gifty-logo.png"

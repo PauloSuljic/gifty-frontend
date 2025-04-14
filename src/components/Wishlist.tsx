@@ -14,10 +14,10 @@ import {
   DndContext,
   closestCenter,
   DragEndEvent,
-  PointerSensor,
   useSensor,
   useSensors,
-  TouchSensor
+  TouchSensor,
+  MouseSensor
 } from '@dnd-kit/core';
 
 import {
@@ -475,13 +475,6 @@ const Wishlist = () => {
     );
   };
 
-  const pointerSensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      delay: 300, // ⏳ Wait 300ms before drag starts
-      tolerance: 5, // 📱 Allow minor movement before canceling
-    },
-  });
-
   const touchSensor = useSensor(TouchSensor, {
     activationConstraint: {
       delay: 300,
@@ -489,7 +482,9 @@ const Wishlist = () => {
     },
   });
   
-  const sensors = useSensors(pointerSensor, touchSensor);  
+  const mouseSensor = useSensor(MouseSensor); // Optional: desktop support
+
+  const sensors = useSensors(touchSensor, mouseSensor);
   
   return (
     <div className="max-w-4xl mx-auto text-white px-4">
