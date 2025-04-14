@@ -177,6 +177,7 @@ const SharedWithMe = () => {
                           isReserved={item.isReserved}
                           reservedBy={item.reservedBy}
                           wishlistOwner={group.ownerId}
+                          context="shared"
                           currentUser={firebaseUser?.uid || ""}
                           onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
                         />

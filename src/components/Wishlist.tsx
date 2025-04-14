@@ -588,22 +588,7 @@ const Wishlist = () => {
                         </div>
                       </div>
 
-                      {/* Add Item Button */}
-                      <button
-                        onClick={() => {
-                          setSelectedWishlist(wishlist.id);
-                          setExpandedWishlistIds((prev) =>
-                            prev.includes(wishlist.id) ? prev : [...prev, wishlist.id]
-                          );
-                          setIsModalOpen(true);
-                        }}
-                        className="px-4 py-2 mt-4 h-8 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
-                      >
-                        <FiPlus />
-                        <span>Add Item</span>
-                      </button>
-
-                      {/* Display Wishlist Items */}
+                      {/* Collapsible Content */}
                       <div
                         className={`
                           transition-all duration-500 ease-in-out overflow-hidden
@@ -612,31 +597,44 @@ const Wishlist = () => {
                             : "max-h-0 opacity-0 mt-0"}
                         `}
                       >
-                        <div className="mt-4 space-y-3">
-                          {wishlistItems[wishlist.id]?.map((item) => (
-                            <WishlistItem
-                              key={item.id}
-                              id={item.id}
-                              name={item.name}
-                              link={item.link}
-                              isReserved={item.isReserved}
-                              reservedBy={item.reservedBy}
-                              wishlistOwner={wishlist.userId}
-                              currentUser={firebaseUser?.uid}
-                              onDelete={() => {
-                                setItemToDelete({
-                                  id: item.id,
-                                  name: item.name,
-                                  wishlistId: wishlist.id,
-                                  wishlistName: wishlist.name,
-                                });
-                                setIsDeleteModalOpen(true);
-                              }}
-                              onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                              onEdit={() => openEditModal(item, wishlist.id)}
-                            />
-                          ))}
-                        </div>
+                      <button
+                        onClick={() => {
+                          setSelectedWishlist(wishlist.id);
+                          setIsModalOpen(true);
+                        }}
+                        className="px-4 py-2 mb-4 h-8 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
+                      >
+                        <FiPlus />
+                        <span>Add Item</span>
+                      </button>
+
+                      {/* Display Wishlist Items */}
+                      <div className="space-y-3">
+                        {wishlistItems[wishlist.id]?.map((item) => (
+                          <WishlistItem
+                            key={item.id}
+                            id={item.id}
+                            name={item.name}
+                            link={item.link}
+                            isReserved={item.isReserved}
+                            reservedBy={item.reservedBy}
+                            context="own"
+                            wishlistOwner={wishlist.userId}
+                            currentUser={firebaseUser?.uid}
+                            onDelete={() => {
+                              setItemToDelete({
+                                id: item.id,
+                                name: item.name,
+                                wishlistId: wishlist.id,
+                                wishlistName: wishlist.name,
+                              });
+                              setIsDeleteModalOpen(true);
+                            }}
+                            onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                            onEdit={() => openEditModal(item, wishlist.id)}
+                          />
+                        ))}
+                      </div>
                       </div>
                     </Card>
                   </SortableItem>

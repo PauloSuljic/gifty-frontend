@@ -10,6 +10,7 @@ type WishlistItemProps = {
   reservedBy?: string | null;
   wishlistOwner: string;
   currentUser?: string;
+  context: "own" | "shared";
   onToggleReserve: () => void;
   onDelete?: () => void;
   onEdit?: () => void;
@@ -22,6 +23,7 @@ const WishlistItem = ({
   reservedBy,
   wishlistOwner,
   currentUser,
+  context="own",
   onToggleReserve,
   onDelete,
   onEdit,
@@ -61,24 +63,31 @@ const WishlistItem = ({
         className="relative p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4"
         onClick={() => setShowActions((prev) => !prev)}
       >
-        {isReserved && (
-          <div className="absolute top-3 right-3 text-purple-400 text-lg">
-            <FiLock />
-          </div>
-        )}
-
-        {canDelete && (
+        {canDelete && showActions && (
           <button
             onClick={onDelete}
-            className="absolute top-3 right-3 text-red-500 hover:text-red-700"
+            className="absolute top-3 right-3 text-red-500 hover:text-red-600"
             title="Delete Item"
           >
-            <FiTrash2 size={18} />
+            <FiTrash2 className="text-lg" />
           </button>
         )}
 
-        <h3 className={`font-semibold flex items-center gap-2 mb-2 ${isMobile ? "text-base" : "text-lg"}`}>
-          {name}
+        <h3 className="text-lg font-semibold flex items-center justify-between mb-2">
+          <span className="flex items-center gap-2">
+            {name}
+          </span>
+          {context === "shared" && isReserved && (
+            showActions ? (
+              <div className="absolute top-3 right-3 text-purple-400">
+                <FiLock />
+              </div>
+            ) : (
+              <div className="text-purple-400">
+                <FiLock />
+              </div>
+            )
+          )}
         </h3>
 
         <div
