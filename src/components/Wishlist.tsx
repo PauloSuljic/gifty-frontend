@@ -487,7 +487,7 @@ const Wishlist = () => {
   const sensors = useSensors(touchSensor, mouseSensor);
   
   return (
-    <div className="max-w-4xl mx-auto text-white px-4">
+    <div className="max-w-4xl mx-auto text-white">
       {/* Create New Wishlist */}
       <div className="flex justify-center mb-6">
         <button
@@ -513,12 +513,12 @@ const Wishlist = () => {
                 return (
                   <SortableItem key={wishlist.id} id={wishlist.id}>
                     {({ listeners, attributes }) => (
-                      <div className="relative pl-6"> {/* ⬅️ creates space for drag arrows */}
+                      <div className="relative pl-6">
                         {/* 🟣 Drag Handle - placed outside the Card to the left */}
                         <div
                           {...listeners}
                           {...attributes}
-                          className="absolute -left-2 top-1/2 -translate-y-1/2 flex flex-col items-center text-gray-400 hover:text-purple-400 cursor-grab active:cursor-grabbing z-20"
+                          className="absolute -left-1 top-1/2 -translate-y-1/2 flex flex-col items-center text-gray-400 hover:text-purple-400 cursor-grab active:cursor-grabbing z-20"
                           title="Drag to reorder"
                         >
                           <span className="text-xs leading-none">▲</span>
