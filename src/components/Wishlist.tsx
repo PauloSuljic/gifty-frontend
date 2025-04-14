@@ -512,128 +512,144 @@ const Wishlist = () => {
 
                 return (
                   <SortableItem key={wishlist.id} id={wishlist.id}>
-                    <Card className="break-inside-avoid mb-6">
-                      {/* Wishlist Title & Actions */}
-                      <div className="flex justify-between items-center flex-wrap gap-2">
-                        <button
-                          onClick={() => toggleWishlistDropdown(wishlist.id)}
-                          className="flex-1 text-left text-xl font-semibold text-white"
+                    {({ listeners, attributes }) => (
+                      <div className="relative pl-6"> {/* ⬅️ creates space for drag arrows */}
+                        {/* 🟣 Drag Handle - placed outside the Card to the left */}
+                        <div
+                          {...listeners}
+                          {...attributes}
+                          className="absolute -left-2 top-1/2 -translate-y-1/2 flex flex-col items-center text-gray-400 hover:text-purple-400 cursor-grab active:cursor-grabbing z-20"
+                          title="Drag to reorder"
                         >
-                          {wishlist.name}
-                          <span className="ml-2 text-sm text-gray-400">
-                            {expandedWishlistIds.includes(wishlist.id) ? "▲" : "▼"}
-                          </span>
-                        </button>
-
-                        {/* 🔧 Dropdown Menu */}
-                        <div className="relative">
-                          <Menu as="div" className="relative inline-block text-left z-20">
-                            <Menu.Button className="p-2 text-white hover:text-purple-400 transition">
-                              <FiMoreVertical size={20} />
-                            </Menu.Button>
-
-                            <Menu.Items className="absolute right-0 mt-2 w-40 origin-top-right divide-y divide-gray-700 rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                              <div className="py-1">
-                                <Menu.Item>
-                                  {({ active }) => (
-                                    <button
-                                      onClick={() => generateShareLink(wishlist.id)}
-                                      className={`${
-                                        active ? "bg-gray-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
-                                    >
-                                      <FiLink /> Share
-                                    </button>
-                                  )}
-                                </Menu.Item>
-                                <Menu.Item>
-                                  {({ active }) => (
-                                    <button
-                                      onClick={() => {
-                                        setWishlistToRename({ id: wishlist.id, name: wishlist.name });
-                                        setNewWishlistName(wishlist.name);
-                                        setIsRenameModalOpen(true);
-                                      }}
-                                      className={`${
-                                        active ? "bg-gray-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
-                                    >
-                                      <FiEdit /> Rename
-                                    </button>
-                                  )}
-                                </Menu.Item>
-                                <Menu.Item>
-                                  {({ active }) => (
-                                    <button
-                                      onClick={() => {
-                                        setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
-                                        setIsWishlistDeleteModalOpen(true);
-                                      }}
-                                      className={`${
-                                        active ? "bg-red-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-base text-red-400 gap-2`}
-                                    >
-                                      <FiTrash2 /> Delete
-                                    </button>
-                                  )}
-                                </Menu.Item>
-                              </div>
-                            </Menu.Items>
-                          </Menu>
+                          <span className="text-xs leading-none">▲</span>
+                          <span className="text-xs leading-none">▼</span>
                         </div>
-                      </div>
+                
+                        {/* 💳 Card Content */}
+                        <Card className="relative break-inside-avoid mb-6">
+                          <div className="flex justify-between items-center flex-wrap gap-2">
+                            {/* Wishlist Title & Expand Button */}
+                            <button
+                              onClick={() => toggleWishlistDropdown(wishlist.id)}
+                              className="flex-1 text-left text-lg font-semibold text-white pl-2"
+                            >
+                              {wishlist.name}
+                              <span className="ml-2 text-sm text-gray-400">
+                                {expandedWishlistIds.includes(wishlist.id) ? "▲" : "▼"}
+                              </span>
+                            </button>
+                
+                            {/* 🔧 Dropdown Menu */}
+                            <div className="relative">
+                              <Menu as="div" className="relative inline-block text-left z-20">
+                                <Menu.Button className="p-2 text-white hover:text-purple-400 transition">
+                                  <FiMoreVertical size={20} />
+                                </Menu.Button>
 
-                      {/* Collapsible Content */}
-                      <div
-                        className={`
-                          transition-all duration-500 ease-in-out overflow-hidden
-                          ${expandedWishlistIds.includes(wishlist.id)
-                            ? "max-h-[1000px] opacity-100 mt-4"
-                            : "max-h-0 opacity-0 mt-0"}
-                        `}
-                      >
-                      <button
-                        onClick={() => {
-                          setSelectedWishlist(wishlist.id);
-                          setIsModalOpen(true);
-                        }}
-                        className="px-4 py-2 mb-4 h-8 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
-                      >
-                        <FiPlus />
-                        <span>Add Item</span>
-                      </button>
-
-                      {/* Display Wishlist Items */}
-                      <div className="space-y-3">
-                        {wishlistItems[wishlist.id]?.map((item) => (
-                          <WishlistItem
-                            key={item.id}
-                            id={item.id}
-                            name={item.name}
-                            link={item.link}
-                            isReserved={item.isReserved}
-                            reservedBy={item.reservedBy}
-                            context="own"
-                            wishlistOwner={wishlist.userId}
-                            currentUser={firebaseUser?.uid}
-                            onDelete={() => {
-                              setItemToDelete({
-                                id: item.id,
-                                name: item.name,
-                                wishlistId: wishlist.id,
-                                wishlistName: wishlist.name,
-                              });
-                              setIsDeleteModalOpen(true);
-                            }}
-                            onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
-                            onEdit={() => openEditModal(item, wishlist.id)}
-                          />
-                        ))}
+                                <Menu.Items className="absolute right-0 mt-2 w-40 origin-top-right divide-y divide-gray-700 rounded-md bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                  <div className="py-1">
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <button
+                                          onClick={() => generateShareLink(wishlist.id)}
+                                          className={`${
+                                            active ? "bg-gray-700" : ""
+                                          } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
+                                        >
+                                          <FiLink /> Share
+                                        </button>
+                                      )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <button
+                                          onClick={() => {
+                                            setWishlistToRename({ id: wishlist.id, name: wishlist.name });
+                                            setNewWishlistName(wishlist.name);
+                                            setIsRenameModalOpen(true);
+                                          }}
+                                          className={`${
+                                            active ? "bg-gray-700" : ""
+                                          } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
+                                        >
+                                          <FiEdit /> Rename
+                                        </button>
+                                      )}
+                                    </Menu.Item>
+                                    <Menu.Item>
+                                      {({ active }) => (
+                                        <button
+                                          onClick={() => {
+                                            setWishlistToDelete({ id: wishlist.id, name: wishlist.name });
+                                            setIsWishlistDeleteModalOpen(true);
+                                          }}
+                                          className={`${
+                                            active ? "bg-red-700" : ""
+                                          } flex items-center w-full px-4 py-2 text-base text-red-400 gap-2`}
+                                        >
+                                          <FiTrash2 /> Delete
+                                        </button>
+                                      )}
+                                    </Menu.Item>
+                                  </div>
+                                </Menu.Items>
+                              </Menu>
+                            </div>
+                          </div>
+                
+                          {/* Collapsible Content */}
+                          <div
+                            className={`
+                              transition-all duration-500 ease-in-out overflow-hidden
+                              ${expandedWishlistIds.includes(wishlist.id)
+                                ? "max-h-[1000px] opacity-100 mt-4"
+                                : "max-h-0 opacity-0 mt-0"}
+                            `}
+                          >
+                            <button
+                              onClick={() => {
+                                setSelectedWishlist(wishlist.id);
+                                setIsModalOpen(true);
+                              }}
+                              className="px-4 py-2 mb-4 h-8 bg-purple-500 rounded-lg transition hover:bg-purple-600 w-full flex items-center justify-center space-x-2"
+                            >
+                              <FiPlus />
+                              <span>Add Item</span>
+                            </button>
+                
+                            {/* Wishlist Items */}
+                            <div className="space-y-3">
+                              {wishlistItems[wishlist.id]?.map((item) => (
+                                <WishlistItem
+                                  key={item.id}
+                                  id={item.id}
+                                  name={item.name}
+                                  link={item.link}
+                                  isReserved={item.isReserved}
+                                  reservedBy={item.reservedBy}
+                                  context="own"
+                                  wishlistOwner={wishlist.userId}
+                                  currentUser={firebaseUser?.uid}
+                                  onDelete={() => {
+                                    setItemToDelete({
+                                      id: item.id,
+                                      name: item.name,
+                                      wishlistId: wishlist.id,
+                                      wishlistName: wishlist.name,
+                                    });
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                  onToggleReserve={() => toggleReservation(wishlist.id, item.id)}
+                                  onEdit={() => openEditModal(item, wishlist.id)}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </Card>
                       </div>
-                      </div>
-                    </Card>
+                    )}
                   </SortableItem>
-                );
+                );                
               })}
             </div>
           </SortableContext>
