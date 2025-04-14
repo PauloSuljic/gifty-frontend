@@ -24,7 +24,7 @@ export const SortableItem = ({ id, children }: SortableItemProps) => {
         transition,
         opacity: isDragging ? 0.5 : 1,
         cursor: isDragging ? "grabbing" : "grab",
-        // ❌ Don't set touchAction: 'none' here!
+        touchAction: "none"
       }}
       className="relative select-none"
       {...attributes}
