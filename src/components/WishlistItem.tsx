@@ -73,7 +73,7 @@ const WishlistItem = ({
           </button>
         )}
 
-        <h3 className="text-lg font-semibold flex items-center justify-between mb-2">
+        <h3 className="sm:text-lg font-semibold flex items-center justify-between mb-2">
           <span className="flex items-center gap-2">
             {name}
           </span>
