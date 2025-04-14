@@ -545,7 +545,7 @@ const Wishlist = () => {
                                       onClick={() => generateShareLink(wishlist.id)}
                                       className={`${
                                         active ? "bg-gray-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-sm text-white gap-2`}
+                                      } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
                                     >
                                       <FiLink /> Share
                                     </button>
@@ -561,7 +561,7 @@ const Wishlist = () => {
                                       }}
                                       className={`${
                                         active ? "bg-gray-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-sm text-white gap-2`}
+                                      } flex items-center w-full px-4 py-2 text-base text-white gap-2`}
                                     >
                                       <FiEdit /> Rename
                                     </button>
@@ -576,7 +576,7 @@ const Wishlist = () => {
                                       }}
                                       className={`${
                                         active ? "bg-red-700" : ""
-                                      } flex items-center w-full px-4 py-2 text-sm text-red-400 gap-2`}
+                                      } flex items-center w-full px-4 py-2 text-base text-red-400 gap-2`}
                                     >
                                       <FiTrash2 /> Delete
                                     </button>

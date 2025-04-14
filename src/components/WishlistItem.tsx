@@ -50,8 +50,7 @@ const WishlistItem = ({
   };
 
   const baseBtn =
-  "h-7 w-[50px] sm:w-[80px] flex items-center justify-center gap-1 text-sm rounded-md transition";
-
+  "h-7 w-[90px] sm:w-[120px] flex items-center justify-center gap-1 text-xs sm:text-sm rounded-md transition";
 
   const purpleBtn =
     "border border-purple-500 text-purple-400 hover:bg-purple-600 hover:text-white";
@@ -59,16 +58,32 @@ const WishlistItem = ({
   return (
     <>
       <div
-        className="p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4"
-        onClick={() => isMobile && setShowActions((prev) => !prev)}
+        className="relative p-4 bg-slate-800 text-white rounded-2xl shadow-md border border-slate-600 hover:border-purple-500 transition mb-4"
+        onClick={() => setShowActions((prev) => !prev)}
       >
+        {isReserved && (
+          <div className="absolute top-3 right-3 text-purple-400 text-lg">
+            <FiLock />
+          </div>
+        )}
+
+        {canDelete && (
+          <button
+            onClick={onDelete}
+            className="absolute top-3 right-3 text-red-500 hover:text-red-700"
+            title="Delete Item"
+          >
+            <FiTrash2 size={18} />
+          </button>
+        )}
+
         <h3 className={`font-semibold flex items-center gap-2 mb-2 ${isMobile ? "text-base" : "text-lg"}`}>
           {name}
         </h3>
 
         <div
           className={`flex flex-wrap justify-center items-center gap-3 transition-all ${
-            isMobile && !showActions ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto mt-2"
+            !showActions ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto mt-2"
           }`}
         >
           {link && (
@@ -80,54 +95,35 @@ const WishlistItem = ({
               title="View Item"
             >
               <FiExternalLink />
-              {!isMobile && "View"}
+              View
             </a>
           )}
 
           {canReserve && (
-            <button
-              onClick={() => handleConfirmClick("reserve")}
-              className={`${baseBtn} ${purpleBtn}`}
-            >
+            <button onClick={() => handleConfirmClick("reserve")} className={`${baseBtn} ${purpleBtn}`}>
               <FiUnlock />
-              {!isMobile && "Reserve"}
+              Reserve
             </button>
           )}
 
           {canUnreserve && (
-            <button
-              onClick={() => handleConfirmClick("unreserve")}
-              className={`${baseBtn} ${purpleBtn}`}
-            >
+            <button onClick={() => handleConfirmClick("unreserve")} className={`${baseBtn} ${purpleBtn}`}>
               <FiLock />
-              {!isMobile && "Unreserve"}
+              Unreserve
             </button>
           )}
 
           {canDelete && (
             <>
-              <button
-                onClick={onEdit}
-                className={`${baseBtn} ${purpleBtn}`}
-                title="Edit Item"
-              >
+              <button onClick={onEdit} className={`${baseBtn} ${purpleBtn}`} title="Edit Item">
                 <FiEdit />
-                {!isMobile && "Edit"}
-              </button>
-              <button
-                onClick={onDelete}
-                className={`${baseBtn} bg-red-600 hover:bg-red-700 text-white`}
-                title="Delete Item"
-              >
-                <FiTrash2 />
-                {!isMobile && "Delete"}
+                Edit
               </button>
             </>
           )}
         </div>
       </div>
 
-      {/* Confirmation Modal */}
       <ConfirmReserveModal
         isOpen={modalAction !== null}
         onClose={() => setModalAction(null)}
