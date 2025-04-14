@@ -16,7 +16,8 @@ import {
   DragEndEvent,
   PointerSensor,
   useSensor,
-  useSensors
+  useSensors,
+  TouchSensor
 } from '@dnd-kit/core';
 
 import {
@@ -480,8 +481,15 @@ const Wishlist = () => {
       tolerance: 5, // 📱 Allow minor movement before canceling
     },
   });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 300,
+      tolerance: 5,
+    },
+  });
   
-  const sensors = useSensors(pointerSensor);  
+  const sensors = useSensors(pointerSensor, touchSensor);  
   
   return (
     <div className="max-w-4xl mx-auto text-white px-4">
