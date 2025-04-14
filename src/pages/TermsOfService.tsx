@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 
 const TermsOfService = () => {
   return (
-    <div className="h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
-      {/* Mobile Top Row: Logo like in Layout */}
-      <div className="flex justify-center items-center w-full mb-6">
+    <div className="min-h-screen bg-gray-900 text-white px-4 pt-8 pb-16">
+      {/* 🔝 Logo Section */}
+      <div className="flex justify-center items-center w-full mb-8">
         <Link
           to="/dashboard"
-          className="p-3 m-3 flex items-center justify-center text-center"
+          className="p-3 flex items-center justify-center text-center"
         >
           <img
             src="/gifty-logo.png"
@@ -17,8 +17,8 @@ const TermsOfService = () => {
         </Link>
       </div>
 
-      {/* Main Content Card */}
-      <div className="max-w-3xl w-full bg-gray-900 p-8 rounded-2xl shadow-lg">
+      {/* 📄 Main Content */}
+      <div className="max-w-3xl w-full mx-auto bg-gray-900 p-8 rounded-2xl shadow-lg">
         <h1 className="text-4xl font-bold text-center mb-6">Terms of Service</h1>
 
         <p className="mb-4 text-gray-300 text-center">
