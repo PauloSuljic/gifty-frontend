@@ -1,3 +1,7 @@
+📦 This repository has been archived.  
+🎯 The project has been merged into a monorepo: [gifty-app](https://github.com/PauloSuljic/gifty-app)
+
+
 # 🎁 Gifty Frontend
 
 > A modern, responsive wishlist sharing app built with **React**, **Firebase**, and **Tailwind CSS**.  
